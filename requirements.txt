@@ -1,0 +1,16 @@
+sscws>=1.0
+cdasws>=1.0
+astropy>=6.0
+sgp4>=2.0
+torch>=2.0
+tensorflow>=2.15
+numpy>=1.24
+pandas>=2.0
+scipy>=1.11
+matplotlib>=3.8
+plotly>=5.18
+pyarrow>=14.0
+pyyaml>=6.0
+jupyter>=1.0
+scikit-learn>=1.3
+tqdm>=4.65

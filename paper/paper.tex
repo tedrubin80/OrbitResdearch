@@ -1,0 +1,323 @@
+\documentclass[twocolumn]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{natbib}
+\usepackage[margin=1in]{geometry}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+\title{Multi-Modal Deep Learning for Spacecraft Orbit Prediction:\\
+  Incorporating Solar Wind Perturbations via Cross-Attention Fusion}
+
+\author{
+  Ted Rubin \\
+  % \textit{Affiliation} \\
+  % \texttt{email@example.com}
+}
+
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+% ============================================================
+\begin{abstract}
+Accurate spacecraft orbit prediction is critical for collision avoidance,
+mission planning, and space situational awareness. Traditional propagators
+(SGP4, numerical integrators) rely on simplified atmospheric and
+gravitational models that degrade during geomagnetic storms when the
+thermosphere expands unpredictably. We present a multi-modal deep learning
+approach that combines historical spacecraft position time series with
+real-time solar wind measurements to improve orbit prediction accuracy
+during space weather events. Using three years (2023--2025) of NASA SSC
+position data for spacecraft in LEO, L1, and highly elliptical orbits,
+combined with OMNI solar wind parameters, we demonstrate that a
+cross-attention fusion architecture outperforms both SGP4 baselines and
+single-modality LSTM/Transformer models, particularly during periods of
+elevated geomagnetic activity (Kp $> 5$). Our results suggest that solar
+wind information provides a leading indicator of orbit perturbations with
+an optimal lag of [TBD] hours, enabling proactive trajectory correction.
+
+\bigskip
+\noindent\textbf{Keywords:} orbit prediction, deep learning, solar wind,
+space weather, LSTM, Transformer, multi-modal learning, spacecraft tracking
+\end{abstract}
+
+% ============================================================
+\section{Introduction}
+\label{sec:intro}
+
+Space situational awareness (SSA) requires accurate prediction of
+spacecraft trajectories to prevent collisions and optimize mission
+operations. The standard approach uses the Simplified General Perturbations
+model (SGP4)~\citep{vallado2006revisiting}, which propagates orbits using
+Two-Line Element (TLE) sets. While SGP4 performs well for short-term
+predictions under quiet conditions, its accuracy degrades significantly
+during geomagnetic storms when the thermosphere heats and expands,
+increasing atmospheric drag on low Earth orbit (LEO) satellites.
+
+Recent advances in deep learning for time-series forecasting have opened
+new possibilities for orbit prediction. Unlike physics-based propagators,
+neural networks can learn complex, nonlinear relationships between
+environmental conditions and trajectory perturbations directly from data.
+
+\subsection{Contributions}
+
+This paper makes the following contributions:
+
+\begin{enumerate}
+  \item We demonstrate that LSTM and Transformer architectures can
+    outperform SGP4 for short-horizon (6--24h) orbit prediction when
+    trained on sufficient historical data.
+  \item We introduce a cross-attention multi-modal architecture that fuses
+    spacecraft position sequences with solar wind measurements, showing
+    [TBD]\% error reduction during geomagnetic storms.
+  \item We provide a systematic analysis of the lag relationship between
+    solar wind conditions at L1 and orbit perturbations for different
+    orbit types (LEO, HEO, L1).
+  \item We release an open-source pipeline for fetching, processing, and
+    modeling spacecraft trajectory data from NASA SSC.
+\end{enumerate}
+
+% ============================================================
+\section{Related Work}
+\label{sec:related}
+
+\subsection{Physics-Based Orbit Prediction}
+
+% SGP4, numerical propagators, atmospheric density models
+% Limitations during geomagnetic storms
+% [TO BE FILLED WITH LITERATURE REVIEW]
+
+\subsection{Machine Learning for Orbit Prediction}
+
+% Recent ML approaches to orbit determination
+% LSTM for trajectory forecasting
+% Transformers for time-series
+% [TO BE FILLED]
+
+\subsection{Solar Wind and Space Weather}
+
+% Solar wind measurements at L1
+% Geomagnetic indices (Kp, Dst)
+% Thermosphere response to geomagnetic storms
+% [TO BE FILLED]
+
+% ============================================================
+\section{Data}
+\label{sec:data}
+
+\subsection{Spacecraft Position Data}
+
+We use the NASA Satellite Situation Center (SSC) REST
+API\footnote{\url{https://sscweb.gsfc.nasa.gov/WebServices/REST/}} to
+obtain spacecraft positions in the Geocentric Solar Ecliptic (GSE)
+coordinate system at 1-minute resolution. We select three spacecraft
+representing distinct orbital regimes:
+
+\begin{itemize}
+  \item \textbf{ISS} (International Space Station): Low Earth Orbit at
+    $\sim$408~km altitude, subject to significant atmospheric drag.
+  \item \textbf{DSCOVR} (Deep Space Climate Observatory): Lissajous orbit
+    around the Sun-Earth L1 Lagrange point ($\sim$1.5 million km from Earth).
+  \item \textbf{MMS-1} (Magnetospheric Multiscale Mission): Highly
+    elliptical orbit passing through Earth's magnetosphere.
+\end{itemize}
+
+Our dataset spans January 2023 through [current date] 2025, comprising
+approximately [TBD] million position records.
+
+\subsection{Solar Wind Data}
+
+Solar wind parameters are obtained from the OMNI database via NASA's
+Coordinated Data Analysis Web (CDAWeb) service. We use the high-resolution
+(1-minute) OMNI dataset, which provides:
+
+\begin{itemize}
+  \item Interplanetary Magnetic Field (IMF) components: $B_x$, $B_y$,
+    $B_z$ in GSE coordinates
+  \item Solar wind bulk flow speed
+  \item Proton number density
+  \item Geomagnetic indices: Kp, Dst
+\end{itemize}
+
+The OMNI data is time-shifted to account for solar wind propagation from
+the measurement point (typically L1) to Earth's bow shock.
+
+\subsection{Data Preprocessing}
+
+% Velocity derivation via finite differences
+% Normalization (per-spacecraft, zero-mean unit-variance)
+% Gap handling and segment identification
+% Sliding window creation
+% Temporal train/val/test split
+
+% ============================================================
+\section{Methods}
+\label{sec:methods}
+
+\subsection{Problem Formulation}
+
+Given a sequence of $T$ past spacecraft states
+$\mathbf{X} = [\mathbf{x}_1, \ldots, \mathbf{x}_T]$ where each
+$\mathbf{x}_t \in \mathbb{R}^6$ contains position and velocity components
+$(x, y, z, \dot{x}, \dot{y}, \dot{z})$ in GSE coordinates, we predict
+the next $H$ positions $\hat{\mathbf{Y}} = [\hat{\mathbf{y}}_{T+1},
+\ldots, \hat{\mathbf{y}}_{T+H}]$ where $\hat{\mathbf{y}}_t \in
+\mathbb{R}^3$ is the predicted position $(x, y, z)$.
+
+For the multi-modal setting, we additionally condition on a concurrent
+solar wind sequence $\mathbf{S} = [\mathbf{s}_1, \ldots, \mathbf{s}_T]$
+where $\mathbf{s}_t \in \mathbb{R}^7$ contains IMF components, flow
+speed, proton density, Kp, and Dst.
+
+\subsection{Baseline: SGP4 / Kepler Propagation}
+
+% Two-body Kepler propagation with Velocity Verlet integration
+% SGP4 propagation from initial state
+
+\subsection{LSTM Architecture}
+
+We employ a bidirectional LSTM encoder with a unidirectional decoder:
+
+\begin{equation}
+  \mathbf{h}_t^{\text{enc}} = \text{BiLSTM}(\mathbf{x}_t, \mathbf{h}_{t-1}^{\text{enc}})
+\end{equation}
+
+The encoder's final hidden state is projected through a bridge layer and
+used to initialize a decoder LSTM that autoregressively generates
+predictions. We also evaluate a direct (non-autoregressive) variant that
+produces all $H$ outputs simultaneously via a global pooling and MLP head.
+
+\subsection{Transformer Architecture}
+
+We use an encoder-decoder Transformer with sinusoidal positional
+encodings. The encoder processes the input sequence via multi-head
+self-attention, and the decoder uses learnable query tokens with
+cross-attention to the encoder memory:
+
+\begin{equation}
+  \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^\top}{\sqrt{d_k}}\right) V
+\end{equation}
+
+\subsection{Multi-Modal Cross-Attention Fusion}
+
+For incorporating solar wind data, we propose a dual-encoder architecture
+with cross-modal attention:
+
+\begin{enumerate}
+  \item \textbf{Orbit Encoder}: Bidirectional LSTM processes spacecraft
+    position/velocity sequences.
+  \item \textbf{Solar Wind Encoder}: Separate bidirectional LSTM processes
+    solar wind parameter sequences.
+  \item \textbf{Cross-Attention}: The orbit representation attends to
+    solar wind features via multi-head cross-attention, learning which
+    solar wind conditions most affect the trajectory.
+  \item \textbf{Fusion}: Attended orbit features and pooled solar wind
+    features are concatenated and passed through an MLP prediction head.
+\end{enumerate}
+
+The model predicts position \emph{residuals} (deviations from the nominal
+orbit), focusing learning capacity on the perturbation signal.
+
+% ============================================================
+\section{Experiments}
+\label{sec:experiments}
+
+\subsection{Experimental Setup}
+
+% Training details: AdamW, cosine LR, early stopping
+% Hardware: [TBD]
+% Hyperparameters table
+
+\subsection{Evaluation Metrics}
+
+We evaluate using Mean Absolute Error (MAE) and Root Mean Square Error
+(RMSE) of the 3D Euclidean position error in kilometers:
+
+\begin{equation}
+  \text{MAE} = \frac{1}{NH} \sum_{i=1}^{N} \sum_{t=1}^{H}
+    \|\hat{\mathbf{y}}_{i,t} - \mathbf{y}_{i,t}\|_2
+\end{equation}
+
+We report metrics at multiple prediction horizons (1h, 6h, 24h) and
+separately for quiet (Kp $\leq 3$) and storm (Kp $> 5$) conditions.
+
+% ============================================================
+\section{Results}
+\label{sec:results}
+
+% [TO BE FILLED WITH EXPERIMENTAL RESULTS]
+
+\subsection{Orbit Prediction Performance}
+
+% Table: Model comparison (SGP4 vs LSTM vs Transformer)
+% Figure: Error vs prediction horizon
+% Per-spacecraft analysis
+
+\begin{table}[h]
+\centering
+\caption{Orbit prediction results (ISS, 6-hour horizon)}
+\label{tab:results}
+\begin{tabular}{lcccc}
+\toprule
+Model & MAE (km) & RMSE (km) & MAE$_{1h}$ & MAE$_{6h}$ \\
+\midrule
+Kepler        & -- & -- & -- & -- \\
+SGP4          & -- & -- & -- & -- \\
+LSTM          & -- & -- & -- & -- \\
+Transformer   & -- & -- & -- & -- \\
+Multi-Modal   & -- & -- & -- & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Solar Wind Impact Analysis}
+
+% Cross-correlation analysis
+% Optimal lag determination
+% Multi-modal vs orbit-only comparison
+% Storm event case studies
+
+\subsection{Ablation Studies}
+
+% Which solar wind parameters matter most
+% Effect of input window length
+% Attention visualization
+
+% ============================================================
+\section{Discussion}
+\label{sec:discussion}
+
+% Interpretation of results
+% Why multi-modal helps during storms
+% Limitations
+% Comparison to operational systems
+
+% ============================================================
+\section{Conclusion}
+\label{sec:conclusion}
+
+% Summary of findings
+% Implications for operational orbit prediction
+% Future work: more spacecraft, real-time deployment, ensemble methods
+
+% ============================================================
+\section*{Data Availability}
+
+All spacecraft position data is publicly available through the NASA
+Satellite Situation Center (SSC) REST API. Solar wind data is available
+through NASA's CDAWeb OMNI database. Our code and trained models are
+available at \url{https://github.com/tedrubin80/OrbitResdearch}.
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}

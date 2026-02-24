@@ -1,0 +1,62 @@
+api:
+  ssc_base_url: "https://sscweb.gsfc.nasa.gov/WS/sscr/2"
+  cdaweb_base_url: "https://cdaweb.gsfc.nasa.gov/WS/cdasr/1"
+
+spacecraft:
+  iss:
+    id: "iss"
+    orbit_type: "LEO"
+    start_date: "2023-01-01"
+    end_date: "2025-12-31"
+  dscovr:
+    id: "dscovr"
+    orbit_type: "L1"
+    start_date: "2023-01-01"
+    end_date: "2025-12-31"
+  mms1:
+    id: "mms1"
+    orbit_type: "HEO"
+    start_date: "2023-01-01"
+    end_date: "2025-12-31"
+
+coordinate_systems:
+  - "Gse"
+  - "Geo"
+
+solar_wind:
+  # 1-minute IMF and plasma data
+  dataset: "OMNI_HRO_1MIN"
+  variables:
+    - "BX_GSE"
+    - "BY_GSE"
+    - "BZ_GSE"
+    - "flow_speed"
+    - "proton_density"
+  # Hourly geomagnetic indices (Kp, Dst are not in 1-min dataset)
+  indices_dataset: "OMNI2_H0_MRG1HR"
+  indices_variables:
+    - "KP1800"
+    - "DST1800"
+    - "AE1800"
+
+data:
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  chunk_days: 30
+
+model:
+  input_hours: 24
+  prediction_horizons:
+    - 6
+    - 24
+  time_resolution_minutes: 1
+
+training:
+  batch_size: 64
+  epochs: 100
+  learning_rate: 0.001
+  weight_decay: 0.01
+  patience: 15
+  train_split: 0.7
+  val_split: 0.15
+  test_split: 0.15

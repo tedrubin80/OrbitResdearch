@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orbital Chaos - ML-Powered Orbit Prediction</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a1a;
+            color: #e0e0e0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        canvas#stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 0 40px;
+        }
+
+        h1 {
+            font-size: 3.2em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #4fc3f7, #7c4dff, #ff4081);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: #90a4ae;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin: 50px 0;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 28px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(79, 195, 247, 0.3);
+        }
+
+        .stat-value {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: #4fc3f7;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #78909c;
+            margin-top: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .section {
+            margin: 60px 0;
+        }
+
+        h2 {
+            font-size: 1.8em;
+            margin-bottom: 24px;
+            color: #b0bec5;
+        }
+
+        .spacecraft-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .spacecraft-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .spacecraft-card h3 {
+            font-size: 1.3em;
+            color: #e0e0e0;
+            margin-bottom: 6px;
+        }
+
+        .orbit-type {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .orbit-leo { background: rgba(76, 175, 80, 0.15); color: #66bb6a; }
+        .orbit-l1 { background: rgba(255, 167, 38, 0.15); color: #ffa726; }
+        .orbit-heo { background: rgba(239, 83, 80, 0.15); color: #ef5350; }
+
+        .spacecraft-card p {
+            color: #78909c;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        .models-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .model-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .model-card h3 { color: #e0e0e0; margin-bottom: 8px; }
+        .model-card p { color: #78909c; font-size: 0.9em; line-height: 1.5; }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75em;
+            background: rgba(124, 77, 255, 0.15);
+            color: #b388ff;
+            margin-right: 6px;
+            margin-top: 10px;
+        }
+
+        .pipeline {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 32px;
+        }
+
+        .pipeline-step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .pipeline-step:last-child { margin-bottom: 0; }
+
+        .step-num {
+            min-width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(79, 195, 247, 0.15);
+            color: #4fc3f7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9em;
+            margin-right: 16px;
+            margin-top: 2px;
+        }
+
+        .step-content h4 { color: #e0e0e0; margin-bottom: 4px; }
+        .step-content p { color: #78909c; font-size: 0.9em; }
+
+        .status-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 40px;
+            padding: 16px 20px;
+            background: rgba(76, 175, 80, 0.08);
+            border: 1px solid rgba(76, 175, 80, 0.2);
+            border-radius: 10px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #66bb6a;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .status-text { color: #81c784; font-size: 0.95em; }
+
+        footer {
+            text-align: center;
+            padding: 60px 0 40px;
+            color: #546e7a;
+            font-size: 0.85em;
+        }
+
+        footer a { color: #4fc3f7; text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2.2em; }
+            .subtitle { font-size: 1em; }
+            header { padding: 40px 0 20px; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="stars"></canvas>
+
+    <div class="container">
+        <header>
+            <h1>Orbital Chaos</h1>
+            <p class="subtitle">
+                Deep learning meets orbital mechanics. We're training LSTM and Transformer
+                models on 3 years of NASA spacecraft data to predict orbits and measure
+                the impact of solar wind on trajectory perturbations.
+            </p>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">4.8M+</div>
+                <div class="stat-label">Data Points</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">3</div>
+                <div class="stat-label">Spacecraft Tracked</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">3 Years</div>
+                <div class="stat-label">2023 - 2025</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">1 min</div>
+                <div class="stat-label">Resolution</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Spacecraft</h2>
+            <div class="spacecraft-grid">
+                <div class="spacecraft-card">
+                    <h3>ISS</h3>
+                    <span class="orbit-type orbit-leo">LEO ~408 km</span>
+                    <p>International Space Station. Low Earth Orbit with significant
+                    atmospheric drag. 1.58M data points. Most affected by thermosphere
+                    expansion during geomagnetic storms.</p>
+                </div>
+                <div class="spacecraft-card">
+                    <h3>DSCOVR</h3>
+                    <span class="orbit-type orbit-l1">L1 ~1.5M km</span>
+                    <p>Deep Space Climate Observatory at the Sun-Earth L1 Lagrange point.
+                    131K data points. Directly measures solar wind before it reaches Earth.</p>
+                </div>
+                <div class="spacecraft-card">
+                    <h3>MMS-1</h3>
+                    <span class="orbit-type orbit-heo">HEO Magnetosphere</span>
+                    <p>Magnetospheric Multiscale Mission. Highly elliptical orbit cutting
+                    through Earth's magnetosphere. 1.54M data points. Most sensitive to
+                    space weather conditions.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Models</h2>
+            <div class="models-section">
+                <div class="model-card">
+                    <h3>Bidirectional LSTM</h3>
+                    <p>Encoder-decoder LSTM with autoregressive decoding. Maps 24h of
+                    position/velocity history to 6-24h predicted trajectories.</p>
+                    <span class="tag">PyTorch</span>
+                    <span class="tag">Sequence-to-Sequence</span>
+                </div>
+                <div class="model-card">
+                    <h3>Transformer</h3>
+                    <p>Encoder-decoder Transformer with sinusoidal positional encoding
+                    and learned query tokens. Multi-head cross-attention.</p>
+                    <span class="tag">PyTorch</span>
+                    <span class="tag">Attention</span>
+                </div>
+                <div class="model-card">
+                    <h3>Multi-Modal Fusion</h3>
+                    <p>Dual-encoder combining orbit positions with solar wind measurements.
+                    Cross-attention lets the model learn which solar wind conditions
+                    most affect the trajectory.</p>
+                    <span class="tag">Cross-Attention</span>
+                    <span class="tag">Solar Wind</span>
+                </div>
+                <div class="model-card">
+                    <h3>SGP4 / Kepler Baseline</h3>
+                    <p>Physics-based orbit propagation using two-body Keplerian mechanics.
+                    The benchmark to beat. ML models target short-horizon improvement.</p>
+                    <span class="tag">Baseline</span>
+                    <span class="tag">Physics</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Data Pipeline</h2>
+            <div class="pipeline">
+                <div class="pipeline-step">
+                    <div class="step-num">1</div>
+                    <div class="step-content">
+                        <h4>NASA SSC API + OMNI</h4>
+                        <p>Automated daily fetch of spacecraft positions (GSE/GEO) and solar
+                        wind parameters (IMF, flow speed, density, Kp, Dst) via cron.</p>
+                    </div>
+                </div>
+                <div class="pipeline-step">
+                    <div class="step-num">2</div>
+                    <div class="step-content">
+                        <h4>Preprocessing</h4>
+                        <p>Velocity derivation, normalization, gap detection, sliding window
+                        creation. L1-to-Earth propagation delay correction for solar wind.</p>
+                    </div>
+                </div>
+                <div class="pipeline-step">
+                    <div class="step-num">3</div>
+                    <div class="step-content">
+                        <h4>Training</h4>
+                        <p>AdamW + cosine LR schedule, early stopping, gradient clipping.
+                        Temporal train/val/test split (70/15/15). Both PyTorch and TensorFlow.</p>
+                    </div>
+                </div>
+                <div class="pipeline-step">
+                    <div class="step-num">4</div>
+                    <div class="step-content">
+                        <h4>Evaluation</h4>
+                        <p>MAE/RMSE in km at 1h, 6h, 24h horizons. Separate analysis for
+                        quiet (Kp &le; 3) vs storm (Kp &gt; 5) conditions.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Research</h2>
+            <p style="color: #90a4ae; line-height: 1.7; max-width: 800px;">
+                We hypothesize that during geomagnetic storms, the thermosphere heats and
+                expands, increasing atmospheric drag on LEO satellites in ways that SGP4
+                cannot predict. By incorporating real-time solar wind data measured at L1
+                (~45 min before arrival at Earth), our multi-modal model can anticipate
+                these perturbations. The dataset captures Dst down to <strong style="color:#ef5350">-406 nT</strong>
+                and Kp up to <strong style="color:#ef5350">8+</strong> &mdash; severe storm events
+                ideal for testing this hypothesis.
+            </p>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-dot"></div>
+            <span class="status-text">Data pipeline active &mdash; fetching new observations daily at 02:00 UTC</span>
+        </div>
+
+        <footer>
+            <p>Data from <a href="https://sscweb.gsfc.nasa.gov/">NASA SSC</a> and
+            <a href="https://omniweb.gsfc.nasa.gov/">OMNI</a> &middot;
+            <a href="https://github.com/tedrubin80/OrbitResdearch">GitHub</a></p>
+        </footer>
+    </div>
+
+    <script>
+        // Starfield background
+        const canvas = document.getElementById('stars');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function initStars() {
+            stars = [];
+            const count = Math.floor((canvas.width * canvas.height) / 8000);
+            for (let i = 0; i < count; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    r: Math.random() * 1.5 + 0.3,
+                    a: Math.random(),
+                    da: (Math.random() - 0.5) * 0.01,
+                });
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (const s of stars) {
+                s.a += s.da;
+                if (s.a > 1 || s.a < 0.1) s.da *= -1;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(200, 220, 255, ${s.a})`;
+                ctx.fill();
+            }
+            requestAnimationFrame(draw);
+        }
+
+        window.addEventListener('resize', () => { resize(); initStars(); });
+        resize();
+        initStars();
+        draw();
+    </script>
+</body>
+</html>
