@@ -90,7 +90,14 @@ s3 = boto3.client(
     aws_access_key_id=os.environ["S3_ACCESS_KEY"],
     aws_secret_access_key=os.environ["S3_SECRET_KEY"],
     region_name=os.environ.get("S3_REGION", "hel1"),
-    config=Config(signature_version="s3v4"),
+    config=Config(signature_version="s3v4", s3={"multipart_chunksize": 8 * 1024 * 1024}),
+)
+
+# Multipart transfer config for large files
+transfer_config = boto3.s3.transfer.TransferConfig(
+    multipart_threshold=8 * 1024 * 1024,
+    max_concurrency=4,
+    multipart_chunksize=8 * 1024 * 1024,
 )
 
 bucket = os.environ.get("S3_BUCKET", "orbit-research")
@@ -122,7 +129,7 @@ for d in dirs_to_backup:
         if f.is_file() and "__pycache__" not in str(f):
             key = f"backup/{timestamp}/{f.relative_to(project)}"
             try:
-                s3.upload_file(str(f), bucket, key)
+                s3.upload_file(str(f), bucket, key, Config=transfer_config)
                 uploaded += 1
             except Exception as e:
                 print(f"  ERROR uploading {f}: {e}", file=sys.stderr)
@@ -133,7 +140,7 @@ for fname in files_to_backup:
     if fpath.exists():
         key = f"backup/{timestamp}/{fname}"
         try:
-            s3.upload_file(str(fpath), bucket, key)
+            s3.upload_file(str(fpath), bucket, key, Config=transfer_config)
             uploaded += 1
         except Exception as e:
             print(f"  ERROR uploading {fpath}: {e}", file=sys.stderr)
@@ -145,7 +152,7 @@ if tarball:
     latest = tarball[-1]
     key = f"backup/{timestamp}/{latest.name}"
     try:
-        s3.upload_file(str(latest), bucket, key)
+        s3.upload_file(str(latest), bucket, key, Config=transfer_config)
         uploaded += 1
         print(f"Uploaded tarball: {latest.name}")
     except Exception as e:
