@@ -318,7 +318,7 @@ def run_training(model_choice, spacecraft, subsample, epochs, progress=gr.Progre
     # Load data
     progress(0.05, desc="Loading data from HF...")
     try:
-        orbit_df = load_parquet_from_hf(f"{spacecraft}_2023-01-01_2025-12-31.parquet")
+        orbit_df = load_parquet_from_hf(f"data/{spacecraft}_2023-01-01_2025-12-31.parquet")
         output.append(f"Loaded orbit data: {len(orbit_df)} rows")
     except Exception as e:
         return f"Failed to load orbit data: {e}"
@@ -358,7 +358,7 @@ def run_training(model_choice, spacecraft, subsample, epochs, progress=gr.Progre
     else:  # Multi-modal
         # Load solar wind too
         try:
-            sw_df = load_parquet_from_hf("solar_wind_2023-01-01_2025-12-31.parquet")
+            sw_df = load_parquet_from_hf("data/solar_wind_2023-01-01_2025-12-31.parquet")
             output.append(f"Solar wind data: {len(sw_df)} rows")
         except Exception as e:
             return f"Failed to load solar wind: {e}"
