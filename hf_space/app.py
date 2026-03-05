@@ -79,30 +79,68 @@ class CrossModalAttention(nn.Module):
 
 
 class SolarWindOrbitModel(nn.Module):
+    """Residual gated multi-modal: output = base_prediction + gate * perturbation."""
     def __init__(self, orbit_input_dim=6, solar_input_dim=7, hidden_dim=128, num_layers=2,
                  nhead=4, horizon=360, output_dim=3, dropout=0.1):
         super().__init__()
         self.horizon, self.output_dim = horizon, output_dim
+        # Orbit encoder
         self.orbit_proj = nn.Linear(orbit_input_dim, hidden_dim)
         self.orbit_enc = nn.LSTM(hidden_dim, hidden_dim, num_layers, batch_first=True, bidirectional=True,
                                  dropout=dropout if num_layers > 1 else 0)
         self.orbit_norm = nn.LayerNorm(hidden_dim * 2)
+        # Base prediction head (LSTM-equivalent)
+        self.base_head = nn.Sequential(
+            nn.Linear(hidden_dim * 2, hidden_dim), nn.GELU(), nn.Dropout(dropout),
+            nn.Linear(hidden_dim, horizon * output_dim))
+        # Solar wind encoder
         self.solar_proj = nn.Linear(solar_input_dim, hidden_dim)
         self.solar_enc = nn.LSTM(hidden_dim, hidden_dim, num_layers, batch_first=True, bidirectional=True,
                                  dropout=dropout if num_layers > 1 else 0)
         self.solar_norm = nn.LayerNorm(hidden_dim * 2)
+        # Cross-attention
         self.cross_attn = CrossModalAttention(hidden_dim * 2, nhead, dropout)
-        self.fusion = nn.Sequential(nn.Linear(hidden_dim * 4, hidden_dim * 2), nn.GELU(),
-                                    nn.Dropout(dropout), nn.Linear(hidden_dim * 2, hidden_dim),
-                                    nn.GELU(), nn.Dropout(dropout))
-        self.pred_head = nn.Linear(hidden_dim, horizon * output_dim)
+        # Attention-weighted summary
+        self.attn_weight = nn.Linear(hidden_dim * 2, 1)
+        # Perturbation head (3-layer MLP)
+        self.perturbation_head = nn.Sequential(
+            nn.Linear(hidden_dim * 2, hidden_dim * 2), nn.GELU(), nn.Dropout(dropout),
+            nn.Linear(hidden_dim * 2, hidden_dim), nn.GELU(), nn.Dropout(dropout),
+            nn.Linear(hidden_dim, horizon * output_dim))
+        # Gate
+        self.gate_net = nn.Sequential(
+            nn.Linear(hidden_dim * 2, hidden_dim), nn.GELU(),
+            nn.Linear(hidden_dim, horizon * output_dim), nn.Sigmoid())
 
     def forward(self, orbit_input, solar_input):
-        o = self.orbit_norm(self.orbit_enc(self.orbit_proj(orbit_input))[0])
+        # Encode orbit
+        orbit_emb = self.orbit_proj(orbit_input)
+        orbit_encoded, (h, _) = self.orbit_enc(orbit_emb)
+        orbit_encoded = self.orbit_norm(orbit_encoded)
+        # Base prediction from final hidden states
+        h_cat = torch.cat([h[-2], h[-1]], dim=-1)
+        base = self.base_head(h_cat).view(-1, self.horizon, self.output_dim)
+        # Encode solar wind
         s = self.solar_norm(self.solar_enc(self.solar_proj(solar_input))[0])
-        attended = self.cross_attn(o, s)
-        fused = torch.cat([attended.mean(1), s.mean(1)], dim=-1)
-        return self.pred_head(self.fusion(fused)).view(-1, self.horizon, self.output_dim)
+        # Cross-attention
+        attended = self.cross_attn(orbit_encoded, s)
+        # Attention-weighted summary
+        attn_scores = torch.softmax(self.attn_weight(attended), dim=1)
+        summary = (attended * attn_scores).sum(dim=1)
+        # Perturbation + gate
+        perturbation = self.perturbation_head(summary).view(-1, self.horizon, self.output_dim)
+        gate = self.gate_net(h_cat).view(-1, self.horizon, self.output_dim)
+        return base + gate * perturbation
+
+    def freeze_solar_branch(self):
+        for module in [self.solar_proj, self.solar_enc, self.solar_norm,
+                       self.cross_attn, self.attn_weight, self.perturbation_head, self.gate_net]:
+            for p in module.parameters():
+                p.requires_grad = False
+
+    def unfreeze_all(self):
+        for p in self.parameters():
+            p.requires_grad = True
 
 
 # ── Data Loading ────────────────────────────────────────────────────────────

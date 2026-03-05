@@ -170,6 +170,105 @@
             margin-top: 10px;
         }
 
+        .mae-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-right: 6px;
+            margin-top: 8px;
+        }
+
+        .mae-good { background: rgba(76, 175, 80, 0.2); color: #66bb6a; }
+        .mae-ok { background: rgba(255, 167, 38, 0.2); color: #ffa726; }
+        .mae-poor { background: rgba(239, 83, 80, 0.2); color: #ef5350; }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .results-table th {
+            background: rgba(255, 255, 255, 0.06);
+            padding: 14px 18px;
+            text-align: left;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #90a4ae;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .results-table td {
+            padding: 12px 18px;
+            font-size: 0.95em;
+            color: #b0bec5;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .results-table tr:last-child td { border-bottom: none; }
+
+        .results-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .best-value {
+            color: #66bb6a;
+            font-weight: 700;
+        }
+
+        .chart-container {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 28px;
+            margin-top: 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        .chart-container h3 {
+            color: #b0bec5;
+            font-size: 1em;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .hf-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 24px;
+            justify-content: center;
+        }
+
+        .hf-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #4fc3f7;
+            text-decoration: none;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .hf-link:hover {
+            border-color: rgba(79, 195, 247, 0.4);
+            background: rgba(79, 195, 247, 0.08);
+        }
+
         .pipeline {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.06);
@@ -243,6 +342,9 @@
             h1 { font-size: 2.2em; }
             .subtitle { font-size: 1em; }
             header { padding: 40px 0 20px; }
+            .results-table { font-size: 0.85em; }
+            .results-table th, .results-table td { padding: 8px 10px; }
+            .hf-links { flex-direction: column; align-items: center; }
         }
     </style>
 </head>
@@ -253,9 +355,9 @@
         <header>
             <h1>Orbital Chaos</h1>
             <p class="subtitle">
-                Deep learning meets orbital mechanics. We're training LSTM and Transformer
-                models on 3 years of NASA spacecraft data to predict orbits and measure
-                the impact of solar wind on trajectory perturbations.
+                Deep learning meets orbital mechanics. We trained LSTM, Transformer,
+                and multi-modal models on 3 years of NASA spacecraft data to predict
+                orbits and measure the impact of solar wind on trajectory perturbations.
             </p>
         </header>
 
@@ -313,6 +415,10 @@
                     position/velocity history to 6-24h predicted trajectories.</p>
                     <span class="tag">PyTorch</span>
                     <span class="tag">Sequence-to-Sequence</span>
+                    <br>
+                    <span class="mae-badge mae-good">ISS: 126 km</span>
+                    <span class="mae-badge mae-ok">DSCOVR: 12,797 km</span>
+                    <span class="mae-badge mae-ok">MMS1: 18,683 km</span>
                 </div>
                 <div class="model-card">
                     <h3>Transformer</h3>
@@ -320,6 +426,10 @@
                     and learned query tokens. Multi-head cross-attention.</p>
                     <span class="tag">PyTorch</span>
                     <span class="tag">Attention</span>
+                    <br>
+                    <span class="mae-badge mae-ok">ISS: 295 km</span>
+                    <span class="mae-badge mae-ok">DSCOVR: 13,517 km</span>
+                    <span class="mae-badge mae-ok">MMS1: 19,237 km</span>
                 </div>
                 <div class="model-card">
                     <h3>Multi-Modal Fusion</h3>
@@ -328,6 +438,10 @@
                     most affect the trajectory.</p>
                     <span class="tag">Cross-Attention</span>
                     <span class="tag">Solar Wind</span>
+                    <br>
+                    <span class="mae-badge mae-good">ISS: 175 km</span>
+                    <span class="mae-badge mae-poor">DSCOVR: 25,059 km</span>
+                    <span class="mae-badge mae-ok">MMS1: 19,457 km</span>
                 </div>
                 <div class="model-card">
                     <h3>SGP4 / Kepler Baseline</h3>
@@ -337,6 +451,98 @@
                     <span class="tag">Physics</span>
                 </div>
             </div>
+        </div>
+
+        <div class="section">
+            <h2>Results</h2>
+            <p style="color: #78909c; margin-bottom: 16px; font-size: 0.95em;">
+                6-hour prediction MAE (Mean Absolute Error) in km. Trained on dual RTX 5090 GPUs via RunPod.
+            </p>
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>ISS (LEO)</th>
+                        <th>DSCOVR (L1)</th>
+                        <th>MMS-1 (HEO)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="color: #4fc3f7; font-weight: 600;">LSTM</td>
+                        <td class="best-value">125.80 km</td>
+                        <td class="best-value">12,797 km</td>
+                        <td class="best-value">18,683 km</td>
+                    </tr>
+                    <tr>
+                        <td style="color: #b388ff; font-weight: 600;">Transformer</td>
+                        <td>294.69 km</td>
+                        <td>13,517 km</td>
+                        <td>19,237 km</td>
+                    </tr>
+                    <tr>
+                        <td style="color: #ff4081; font-weight: 600;">Multi-Modal</td>
+                        <td>175 km</td>
+                        <td>25,059 km</td>
+                        <td>19,457 km</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="chart-container">
+                <h3>MAE Comparison (log scale)</h3>
+                <svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;">
+                    <!-- ISS Group -->
+                    <text x="10" y="36" fill="#90a4ae" font-size="12" font-family="sans-serif">ISS (LEO)</text>
+                    <rect x="110" y="14" width="170" height="16" rx="3" fill="#4fc3f7" opacity="0.85"/>
+                    <text x="286" y="27" fill="#b0bec5" font-size="11" font-family="sans-serif">126 km</text>
+                    <rect x="110" y="34" width="200" height="16" rx="3" fill="#7c4dff" opacity="0.85"/>
+                    <text x="316" y="47" fill="#b0bec5" font-size="11" font-family="sans-serif">295 km</text>
+                    <rect x="110" y="54" width="182" height="16" rx="3" fill="#ff4081" opacity="0.85"/>
+                    <text x="298" y="67" fill="#b0bec5" font-size="11" font-family="sans-serif">175 km</text>
+
+                    <!-- DSCOVR Group -->
+                    <text x="10" y="116" fill="#90a4ae" font-size="12" font-family="sans-serif">DSCOVR (L1)</text>
+                    <rect x="110" y="94" width="337" height="16" rx="3" fill="#4fc3f7" opacity="0.85"/>
+                    <text x="453" y="107" fill="#b0bec5" font-size="11" font-family="sans-serif">12,797 km</text>
+                    <rect x="110" y="114" width="345" height="16" rx="3" fill="#7c4dff" opacity="0.85"/>
+                    <text x="461" y="127" fill="#b0bec5" font-size="11" font-family="sans-serif">13,517 km</text>
+                    <rect x="110" y="134" width="358" height="16" rx="3" fill="#ff4081" opacity="0.85"/>
+                    <text x="474" y="147" fill="#b0bec5" font-size="11" font-family="sans-serif">25,059 km</text>
+
+                    <!-- MMS-1 Group -->
+                    <text x="10" y="196" fill="#90a4ae" font-size="12" font-family="sans-serif">MMS-1 (HEO)</text>
+                    <rect x="110" y="174" width="347" height="16" rx="3" fill="#4fc3f7" opacity="0.85"/>
+                    <text x="463" y="187" fill="#b0bec5" font-size="11" font-family="sans-serif">18,683 km</text>
+                    <rect x="110" y="194" width="349" height="16" rx="3" fill="#7c4dff" opacity="0.85"/>
+                    <text x="465" y="207" fill="#b0bec5" font-size="11" font-family="sans-serif">19,237 km</text>
+                    <rect x="110" y="214" width="349" height="16" rx="3" fill="#ff4081" opacity="0.85"/>
+                    <text x="465" y="227" fill="#b0bec5" font-size="11" font-family="sans-serif">19,457 km</text>
+
+                    <!-- Legend -->
+                    <rect x="110" y="245" width="12" height="12" rx="2" fill="#4fc3f7"/>
+                    <text x="126" y="256" fill="#90a4ae" font-size="11" font-family="sans-serif">LSTM</text>
+                    <rect x="180" y="245" width="12" height="12" rx="2" fill="#7c4dff"/>
+                    <text x="196" y="256" fill="#90a4ae" font-size="11" font-family="sans-serif">Transformer</text>
+                    <rect x="290" y="245" width="12" height="12" rx="2" fill="#ff4081"/>
+                    <text x="306" y="256" fill="#90a4ae" font-size="11" font-family="sans-serif">Multi-Modal</text>
+                </svg>
+            </div>
+        </div>
+
+        <div class="hf-links">
+            <a class="hf-link" href="https://huggingface.co/datamatters24/orbital-chaos-predictor" target="_blank" rel="noopener">
+                <svg width="16" height="16" viewBox="0 0 95 88" fill="currentColor"><path d="M47.2 0C22.7 0 2.8 19.9 2.8 44.4c0 19.6 12.7 36.2 30.4 42.1 2.2.4 3-1 3-2.1v-7.4c-12.4 2.7-15-6-15-6-2-5.1-4.9-6.5-4.9-6.5-4-2.8.3-2.7.3-2.7 4.5.3 6.8 4.6 6.8 4.6 4 6.8 10.4 4.8 12.9 3.7.4-2.9 1.5-4.8 2.8-5.9-9.9-1.1-20.3-4.9-20.3-22 0-4.9 1.7-8.8 4.6-11.9-.5-1.1-2-5.7.4-11.8 0 0 3.7-1.2 12.3 4.5 3.6-1 7.4-1.5 11.2-1.5 3.8 0 7.6.5 11.2 1.5 8.5-5.7 12.2-4.5 12.2-4.5 2.4 6.1 1 10.7.5 11.8 2.9 3.1 4.6 7.1 4.6 11.9 0 17.2-10.4 21-20.4 22.1 1.6 1.4 3 4.1 3 8.3v12.3c0 1.2.8 2.5 3.1 2.1C79.7 80.5 92.4 64 92.4 44.4 92.4 19.9 72.5 0 47.2 0z"/></svg>
+                Model Repo
+            </a>
+            <a class="hf-link" href="https://huggingface.co/datasets/datamatters24/orbital-chaos-nasa-ssc" target="_blank" rel="noopener">
+                <svg width="16" height="16" viewBox="0 0 95 88" fill="currentColor"><path d="M47.2 0C22.7 0 2.8 19.9 2.8 44.4c0 19.6 12.7 36.2 30.4 42.1 2.2.4 3-1 3-2.1v-7.4c-12.4 2.7-15-6-15-6-2-5.1-4.9-6.5-4.9-6.5-4-2.8.3-2.7.3-2.7 4.5.3 6.8 4.6 6.8 4.6 4 6.8 10.4 4.8 12.9 3.7.4-2.9 1.5-4.8 2.8-5.9-9.9-1.1-20.3-4.9-20.3-22 0-4.9 1.7-8.8 4.6-11.9-.5-1.1-2-5.7.4-11.8 0 0 3.7-1.2 12.3 4.5 3.6-1 7.4-1.5 11.2-1.5 3.8 0 7.6.5 11.2 1.5 8.5-5.7 12.2-4.5 12.2-4.5 2.4 6.1 1 10.7.5 11.8 2.9 3.1 4.6 7.1 4.6 11.9 0 17.2-10.4 21-20.4 22.1 1.6 1.4 3 4.1 3 8.3v12.3c0 1.2.8 2.5 3.1 2.1C79.7 80.5 92.4 64 92.4 44.4 92.4 19.9 72.5 0 47.2 0z"/></svg>
+                Dataset
+            </a>
+            <a class="hf-link" href="https://github.com/tedrubin80/OrbitResdearch" target="_blank" rel="noopener">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                GitHub
+            </a>
         </div>
 
         <div class="section">
@@ -398,6 +604,7 @@
         <footer>
             <p>Data from <a href="https://sscweb.gsfc.nasa.gov/">NASA SSC</a> and
             <a href="https://omniweb.gsfc.nasa.gov/">OMNI</a> &middot;
+            Models on <a href="https://huggingface.co/datamatters24/orbital-chaos-predictor">Hugging Face</a> &middot;
             <a href="https://github.com/tedrubin80/OrbitResdearch">GitHub</a></p>
         </footer>
     </div>
