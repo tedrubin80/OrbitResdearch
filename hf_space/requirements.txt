@@ -4,4 +4,4 @@ pandas>=2.0
 pyarrow>=14.0
 datasets>=2.14
 huggingface_hub>=0.19
-gradio>=4.0
+gradio>=5.0
