@@ -338,6 +338,120 @@
         footer a { color: #4fc3f7; text-decoration: none; }
         footer a:hover { text-decoration: underline; }
 
+        /* Live ISS Tracker */
+        .tracker-layout {
+            display: flex;
+            gap: 24px;
+            align-items: stretch;
+        }
+
+        .globe-container {
+            flex: 1;
+            min-height: 450px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .iss-info {
+            width: 260px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .iss-stat {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 14px 16px;
+            backdrop-filter: blur(10px);
+        }
+
+        .iss-stat-value {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #4fc3f7;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .iss-stat-label {
+            font-size: 0.75em;
+            color: #78909c;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 2px;
+        }
+
+        /* Space Weather Dashboard */
+        .weather-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .weather-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .weather-value {
+            font-size: 2em;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            margin: 8px 0;
+        }
+
+        .weather-label {
+            font-size: 0.8em;
+            color: #78909c;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .weather-unit {
+            font-size: 0.5em;
+            color: #78909c;
+            font-weight: 400;
+        }
+
+        .kp-bars {
+            display: flex;
+            gap: 3px;
+            justify-content: center;
+            align-items: flex-end;
+            height: 40px;
+            margin-top: 8px;
+        }
+
+        .kp-bar {
+            width: 12px;
+            border-radius: 2px 2px 0 0;
+            min-height: 4px;
+        }
+
+        /* HF Space Embed */
+        .gradio-wrapper {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 4px;
+            overflow: hidden;
+        }
+
+        .gradio-wrapper iframe {
+            width: 100%;
+            height: 650px;
+            border: none;
+            border-radius: 8px;
+        }
+
         @media (max-width: 600px) {
             h1 { font-size: 2.2em; }
             .subtitle { font-size: 1em; }
@@ -345,6 +459,15 @@
             .results-table { font-size: 0.85em; }
             .results-table th, .results-table td { padding: 8px 10px; }
             .hf-links { flex-direction: column; align-items: center; }
+            .tracker-layout { flex-direction: column; }
+            .iss-info {
+                width: 100%;
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            .iss-stat { flex: 1; min-width: 120px; }
+            .globe-container { min-height: 300px; }
+            .gradio-wrapper iframe { height: 500px; }
         }
     </style>
 </head>
@@ -541,6 +664,77 @@
             </a>
         </div>
 
+        <!-- Live ISS Tracker -->
+        <div class="section">
+            <h2>Live ISS Tracker</h2>
+            <p style="color: #78909c; margin-bottom: 16px; font-size: 0.95em;">
+                Real-time International Space Station position on a 3D globe. Updated every 5 seconds.
+            </p>
+            <div class="tracker-layout">
+                <div class="globe-container" id="globe"></div>
+                <div class="iss-info">
+                    <div class="iss-stat">
+                        <div class="iss-stat-value" id="iss-lat">--</div>
+                        <div class="iss-stat-label">Latitude</div>
+                    </div>
+                    <div class="iss-stat">
+                        <div class="iss-stat-value" id="iss-lon">--</div>
+                        <div class="iss-stat-label">Longitude</div>
+                    </div>
+                    <div class="iss-stat">
+                        <div class="iss-stat-value" id="iss-alt">--</div>
+                        <div class="iss-stat-label">Altitude (km)</div>
+                    </div>
+                    <div class="iss-stat">
+                        <div class="iss-stat-value" id="iss-vel">--</div>
+                        <div class="iss-stat-label">Velocity (km/h)</div>
+                    </div>
+                    <div class="iss-stat">
+                        <div class="iss-stat-value" id="iss-time">--</div>
+                        <div class="iss-stat-label">Last Update</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Space Weather Dashboard -->
+        <div class="section">
+            <h2>Space Weather</h2>
+            <p style="color: #78909c; margin-bottom: 16px; font-size: 0.95em;">
+                Current solar wind conditions from NOAA SWPC. These are the signals our multi-modal model uses to predict orbit perturbations.
+            </p>
+            <div class="weather-grid">
+                <div class="weather-card">
+                    <div class="weather-label">Kp Index</div>
+                    <div class="weather-value" id="wx-kp" style="color: #66bb6a;">--</div>
+                    <div class="kp-bars" id="wx-kp-bars"></div>
+                </div>
+                <div class="weather-card">
+                    <div class="weather-label">Solar Wind Speed</div>
+                    <div class="weather-value" id="wx-speed" style="color: #4fc3f7;">-- <span class="weather-unit">km/s</span></div>
+                </div>
+                <div class="weather-card">
+                    <div class="weather-label">IMF Bz</div>
+                    <div class="weather-value" id="wx-bz" style="color: #4fc3f7;">-- <span class="weather-unit">nT</span></div>
+                </div>
+                <div class="weather-card">
+                    <div class="weather-label">Storm Level</div>
+                    <div class="weather-value" id="wx-storm" style="color: #66bb6a;">--</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Try It - Prediction Demo -->
+        <div class="section">
+            <h2>Try It</h2>
+            <p style="color: #78909c; margin-bottom: 16px; font-size: 0.95em;">
+                Run orbit predictions directly in your browser using our trained models on Hugging Face.
+            </p>
+            <div class="gradio-wrapper">
+                <iframe src="https://datamatters24-orbital-chaos-training.hf.space" loading="lazy" title="Orbital Chaos Prediction Demo"></iframe>
+            </div>
+        </div>
+
         <div class="section">
             <h2>Data Pipeline</h2>
             <div class="pipeline">
@@ -646,6 +840,155 @@
         resize();
         initStars();
         draw();
+    </script>
+
+    <!-- Globe.GL for 3D Earth visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/globe.gl"></script>
+
+    <script>
+        // === Live ISS Tracker ===
+        const issTrail = [];
+        const MAX_TRAIL = 40;
+
+        async function fetchISS() {
+            try {
+                const res = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
+                const data = await res.json();
+
+                document.getElementById('iss-lat').textContent = data.latitude.toFixed(2) + '\u00B0';
+                document.getElementById('iss-lon').textContent = data.longitude.toFixed(2) + '\u00B0';
+                document.getElementById('iss-alt').textContent = Math.round(data.altitude).toLocaleString();
+                document.getElementById('iss-vel').textContent = Math.round(data.velocity).toLocaleString();
+                document.getElementById('iss-time').textContent = new Date().toLocaleTimeString();
+
+                // Update trail
+                issTrail.push({ lat: data.latitude, lng: data.longitude });
+                if (issTrail.length > MAX_TRAIL) issTrail.shift();
+
+                // Build points: trail (faded) + current (bright)
+                const points = issTrail.map((p, i) => ({
+                    lat: p.lat,
+                    lng: p.lng,
+                    alt: 0.01,
+                    color: i === issTrail.length - 1 ? '#4fc3f7' : 'rgba(79, 195, 247, ' + (0.1 + 0.5 * i / issTrail.length) + ')',
+                    radius: i === issTrail.length - 1 ? 0.8 : 0.25,
+                }));
+
+                if (window.issGlobe) {
+                    window.issGlobe.pointsData(points);
+                }
+            } catch (e) {
+                document.getElementById('iss-time').textContent = 'Paused';
+            }
+        }
+
+        // === Space Weather Dashboard ===
+        async function fetchWeather() {
+            try {
+                const [kpRes, plasmaRes, magRes] = await Promise.all([
+                    fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json'),
+                    fetch('https://services.swpc.noaa.gov/products/solar-wind/plasma-5-minute.json'),
+                    fetch('https://services.swpc.noaa.gov/products/solar-wind/mag-5-minute.json'),
+                ]);
+
+                const kpData = await kpRes.json();
+                const plasmaData = await plasmaRes.json();
+                const magData = await magRes.json();
+
+                // Latest Kp (skip header row)
+                const latestKp = kpData[kpData.length - 1];
+                const kpValue = parseFloat(latestKp[1]);
+                const kpEl = document.getElementById('wx-kp');
+                kpEl.textContent = kpValue.toFixed(1);
+                kpEl.style.color = kpValue <= 3 ? '#66bb6a' : kpValue <= 5 ? '#ffa726' : '#ef5350';
+
+                // Kp bar chart (last 8 values)
+                const kpBars = document.getElementById('wx-kp-bars');
+                kpBars.innerHTML = '';
+                const recentKp = kpData.slice(Math.max(1, kpData.length - 8));
+                recentKp.forEach(function(row) {
+                    const kp = parseFloat(row[1]);
+                    const bar = document.createElement('div');
+                    bar.className = 'kp-bar';
+                    bar.style.height = Math.max(4, kp / 9 * 40) + 'px';
+                    bar.style.background = kp <= 3 ? '#66bb6a' : kp <= 5 ? '#ffa726' : '#ef5350';
+                    kpBars.appendChild(bar);
+                });
+
+                // Solar wind speed (last valid value)
+                for (var i = plasmaData.length - 1; i > 0; i--) {
+                    if (plasmaData[i][2] && plasmaData[i][2] !== '-999.9' && plasmaData[i][2] !== '') {
+                        document.getElementById('wx-speed').innerHTML =
+                            parseFloat(plasmaData[i][2]).toFixed(0) + ' <span class="weather-unit">km/s</span>';
+                        break;
+                    }
+                }
+
+                // IMF Bz (last valid value)
+                for (var j = magData.length - 1; j > 0; j--) {
+                    if (magData[j][3] && magData[j][3] !== '-999.9' && magData[j][3] !== '') {
+                        var bz = parseFloat(magData[j][3]);
+                        var bzEl = document.getElementById('wx-bz');
+                        bzEl.innerHTML = bz.toFixed(1) + ' <span class="weather-unit">nT</span>';
+                        bzEl.style.color = bz < -10 ? '#ef5350' : bz < 0 ? '#ffa726' : '#4fc3f7';
+                        break;
+                    }
+                }
+
+                // Storm level from Kp
+                var stormEl = document.getElementById('wx-storm');
+                if (kpValue >= 6) {
+                    stormEl.textContent = 'Storm';
+                    stormEl.style.color = '#ef5350';
+                } else if (kpValue >= 4) {
+                    stormEl.textContent = 'Active';
+                    stormEl.style.color = '#ffa726';
+                } else {
+                    stormEl.textContent = 'Quiet';
+                    stormEl.style.color = '#66bb6a';
+                }
+            } catch (e) {
+                document.getElementById('wx-kp').textContent = '--';
+                document.getElementById('wx-storm').textContent = 'Unavailable';
+            }
+        }
+
+        // === Initialize Globe ===
+        function initGlobe() {
+            var container = document.getElementById('globe');
+            if (!container || typeof Globe === 'undefined') return;
+
+            window.issGlobe = Globe()(container)
+                .globeImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg')
+                .bumpImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-topology.png')
+                .backgroundColor('rgba(0,0,0,0)')
+                .atmosphereColor('#4fc3f7')
+                .atmosphereAltitude(0.15)
+                .pointsData([])
+                .pointLat('lat')
+                .pointLng('lng')
+                .pointAltitude('alt')
+                .pointColor('color')
+                .pointRadius('radius')
+                .pointsMerge(false);
+
+            // Slow auto-rotate
+            var controls = window.issGlobe.controls();
+            controls.autoRotate = true;
+            controls.autoRotateSpeed = 0.5;
+            controls.enableZoom = true;
+
+            // Start ISS tracking
+            fetchISS();
+            setInterval(fetchISS, 5000);
+        }
+
+        // === Start everything ===
+        fetchWeather();
+        setInterval(fetchWeather, 300000); // 5 minutes
+
+        // Initialize globe (Globe.GL loaded synchronously above)
+        initGlobe();
     </script>
 </body>
 </html>
