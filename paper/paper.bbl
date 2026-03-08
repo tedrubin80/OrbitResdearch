@@ -1,0 +1,75 @@
+\begin{thebibliography}{10}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Bruinsma et~al.(2003)Bruinsma, Thuillier, and
+  Barlier]{bruinsma2004thermosphere}
+SL~Bruinsma, G~Thuillier, and F~Barlier.
+\newblock The dtm-2000 empirical thermosphere model with new data assimilation
+  and constraints at lower boundary.
+\newblock \emph{Journal of Atmospheric and Solar-Terrestrial Physics},
+  65\penalty0 (9):\penalty0 1053--1070, 2003.
+
+\bibitem[Gonzalez et~al.(1994)Gonzalez, Joselyn, Kamide, Kroehl, Rostoker,
+  Tsurutani, and Vasyliunas]{gonzalez1994geomagnetic}
+WD~Gonzalez, JA~Joselyn, Y~Kamide, HW~Kroehl, G~Rostoker, BT~Tsurutani, and
+  VM~Vasyliunas.
+\newblock What is a geomagnetic storm?
+\newblock \emph{Journal of Geophysical Research: Space Physics}, 99\penalty0
+  (A4):\penalty0 5771--5792, 1994.
+
+\bibitem[King and Papitashvili(2005)]{king2005solar}
+JH~King and NE~Papitashvili.
+\newblock Solar wind spatial scales in and comparisons of hourly wind and ace
+  plasma and magnetic field data.
+\newblock \emph{Journal of Geophysical Research: Space Physics}, 110, 2005.
+
+\bibitem[Licata and Mehta(2022)]{licata2022machine}
+Richard~J Licata and Piyush~M Mehta.
+\newblock Machine learning for satellite orbit prediction.
+\newblock \emph{Advances in Space Research}, 2022.
+
+\bibitem[Loshchilov and Hutter(2019)]{loshchilov2019decoupled}
+Ilya Loshchilov and Frank Hutter.
+\newblock Decoupled weight decay regularization.
+\newblock In \emph{International Conference on Learning Representations}, 2019.
+
+\bibitem[Peng and Bai(2020)]{peng2020deep}
+Hao Peng and Xiaoli Bai.
+\newblock Deep learning for orbit determination.
+\newblock \emph{Journal of Guidance, Control, and Dynamics}, 43\penalty0
+  (8):\penalty0 1574--1580, 2020.
+
+\bibitem[Sutton(2018)]{sutton2018thermospheric}
+Eric~K Sutton.
+\newblock A new method of physics-based data assimilation for the quiet and
+  disturbed thermosphere.
+\newblock \emph{Space Weather}, 16\penalty0 (7):\penalty0 736--753, 2018.
+
+\bibitem[Vallado et~al.(2006)Vallado, Crawford, Hujsak, and
+  Kelso]{vallado2006revisiting}
+David~A Vallado, Paul Crawford, Richard Hujsak, and TS~Kelso.
+\newblock Revisiting spacetrack report \#3: Rev 2.
+\newblock \emph{AIAA/AAS Astrodynamics Specialist Conference}, 2006.
+
+\bibitem[Vaswani et~al.(2017)Vaswani, Shazeer, Parmar, Uszkoreit, Jones, Gomez,
+  Kaiser, and Polosukhin]{vaswani2017attention}
+Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones,
+  Aidan~N Gomez, Lukasz Kaiser, and Illia Polosukhin.
+\newblock Attention is all you need.
+\newblock In \emph{Advances in Neural Information Processing Systems},
+  volume~30, 2017.
+
+\bibitem[Zhou et~al.(2021)Zhou, Zhang, Peng, Zhang, Li, Xiong, and
+  Zhang]{zhou2021informer}
+Haoyi Zhou, Shanghang Zhang, Jieqi Peng, Shuai Zhang, Jianxin Li, Hui Xiong,
+  and Wancai Zhang.
+\newblock Informer: Beyond efficient transformer for long sequence time-series
+  forecasting.
+\newblock \emph{Proceedings of the AAAI Conference on Artificial Intelligence},
+  35\penalty0 (12):\penalty0 11106--11115, 2021.
+
+\end{thebibliography}
