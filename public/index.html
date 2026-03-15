@@ -452,6 +452,48 @@
             border-radius: 8px;
         }
 
+        /* Scroll animations */
+        .animate-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .animate-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Toggle buttons */
+        .toggle-btns {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .toggle-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.04);
+            color: #90a4ae;
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn:hover {
+            border-color: rgba(79, 195, 247, 0.3);
+            color: #b0bec5;
+        }
+
+        .toggle-btn.active {
+            background: rgba(79, 195, 247, 0.12);
+            border-color: rgba(79, 195, 247, 0.4);
+            color: #4fc3f7;
+        }
+
         @media (max-width: 600px) {
             h1 { font-size: 2.2em; }
             .subtitle { font-size: 1em; }
@@ -466,8 +508,11 @@
                 flex-wrap: wrap;
             }
             .iss-stat { flex: 1; min-width: 120px; }
-            .globe-container { min-height: 300px; }
-            .gradio-wrapper iframe { height: 500px; }
+            .globe-container { min-height: 300px; touch-action: none; }
+            .weather-grid { grid-template-columns: repeat(2, 1fr); }
+            .toggle-btns { gap: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            .toggle-btn { padding: 6px 12px; font-size: 0.8em; }
+            .gradio-wrapper iframe { height: 450px; }
         }
     </style>
 </head>
@@ -485,41 +530,41 @@
         </header>
 
         <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-value">4.8M+</div>
+            <div class="stat-card animate-in">
+                <div class="stat-value" data-count="4800000" data-suffix="+" data-format="abbrev">0</div>
                 <div class="stat-label">Data Points</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-value">3</div>
+            <div class="stat-card animate-in">
+                <div class="stat-value" data-count="3">0</div>
                 <div class="stat-label">Spacecraft Tracked</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-value">3 Years</div>
+            <div class="stat-card animate-in">
+                <div class="stat-value" data-count="3" data-suffix=" Years">0</div>
                 <div class="stat-label">2023 - 2025</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-value">1 min</div>
+            <div class="stat-card animate-in">
+                <div class="stat-value" data-count="1" data-suffix=" min">0</div>
                 <div class="stat-label">Resolution</div>
             </div>
         </div>
 
         <div class="section">
-            <h2>Spacecraft</h2>
+            <h2 class="animate-in">Spacecraft</h2>
             <div class="spacecraft-grid">
-                <div class="spacecraft-card">
+                <div class="spacecraft-card animate-in">
                     <h3>ISS</h3>
                     <span class="orbit-type orbit-leo">LEO ~408 km</span>
                     <p>International Space Station. Low Earth Orbit with significant
                     atmospheric drag. 1.58M data points. Most affected by thermosphere
                     expansion during geomagnetic storms.</p>
                 </div>
-                <div class="spacecraft-card">
+                <div class="spacecraft-card animate-in">
                     <h3>DSCOVR</h3>
                     <span class="orbit-type orbit-l1">L1 ~1.5M km</span>
                     <p>Deep Space Climate Observatory at the Sun-Earth L1 Lagrange point.
                     131K data points. Directly measures solar wind before it reaches Earth.</p>
                 </div>
-                <div class="spacecraft-card">
+                <div class="spacecraft-card animate-in">
                     <h3>MMS-1</h3>
                     <span class="orbit-type orbit-heo">HEO Magnetosphere</span>
                     <p>Magnetospheric Multiscale Mission. Highly elliptical orbit cutting
@@ -530,9 +575,9 @@
         </div>
 
         <div class="section">
-            <h2>Models</h2>
+            <h2 class="animate-in">Models</h2>
             <div class="models-section">
-                <div class="model-card">
+                <div class="model-card animate-in">
                     <h3>Bidirectional LSTM</h3>
                     <p>Encoder-decoder LSTM with autoregressive decoding. Maps 24h of
                     position/velocity history to 6-24h predicted trajectories.</p>
@@ -543,7 +588,7 @@
                     <span class="mae-badge mae-ok">DSCOVR: 12,797 km</span>
                     <span class="mae-badge mae-ok">MMS1: 18,683 km</span>
                 </div>
-                <div class="model-card">
+                <div class="model-card animate-in">
                     <h3>Transformer</h3>
                     <p>Encoder-decoder Transformer with sinusoidal positional encoding
                     and learned query tokens. Multi-head cross-attention.</p>
@@ -554,7 +599,7 @@
                     <span class="mae-badge mae-ok">DSCOVR: 13,517 km</span>
                     <span class="mae-badge mae-ok">MMS1: 19,237 km</span>
                 </div>
-                <div class="model-card">
+                <div class="model-card animate-in">
                     <h3>Multi-Modal Fusion</h3>
                     <p>Dual-encoder combining orbit positions with solar wind measurements.
                     Cross-attention lets the model learn which solar wind conditions
@@ -566,7 +611,7 @@
                     <span class="mae-badge mae-poor">DSCOVR: 25,059 km</span>
                     <span class="mae-badge mae-ok">MMS1: 19,457 km</span>
                 </div>
-                <div class="model-card">
+                <div class="model-card animate-in">
                     <h3>SGP4 / Kepler Baseline</h3>
                     <p>Physics-based orbit propagation using two-body Keplerian mechanics.
                     The benchmark to beat. ML models target short-horizon improvement.</p>
@@ -577,11 +622,17 @@
         </div>
 
         <div class="section">
-            <h2>Results</h2>
-            <p style="color: #78909c; margin-bottom: 16px; font-size: 0.95em;">
+            <h2 class="animate-in">Results</h2>
+            <p class="animate-in" style="color: #78909c; margin-bottom: 16px; font-size: 0.95em;">
                 6-hour prediction MAE (Mean Absolute Error) in km. Trained on dual RTX 5090 GPUs via RunPod.
             </p>
-            <table class="results-table">
+            <div class="toggle-btns animate-in">
+                <button class="toggle-btn active" onclick="toggleCondition('all',this)">All</button>
+                <button class="toggle-btn" onclick="toggleCondition('quiet',this)">Quiet (Kp&le;3)</button>
+                <button class="toggle-btn" onclick="toggleCondition('active',this)">Active (Kp 4-5)</button>
+                <button class="toggle-btn" onclick="toggleCondition('storm',this)">Storm (Kp&ge;6)</button>
+            </div>
+            <table class="results-table animate-in" id="results-table">
                 <thead>
                     <tr>
                         <th>Model</th>
@@ -590,66 +641,11 @@
                         <th>MMS-1 (HEO)</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td style="color: #4fc3f7; font-weight: 600;">LSTM</td>
-                        <td class="best-value">125.80 km</td>
-                        <td class="best-value">12,797 km</td>
-                        <td class="best-value">18,683 km</td>
-                    </tr>
-                    <tr>
-                        <td style="color: #b388ff; font-weight: 600;">Transformer</td>
-                        <td>294.69 km</td>
-                        <td>13,517 km</td>
-                        <td>19,237 km</td>
-                    </tr>
-                    <tr>
-                        <td style="color: #ff4081; font-weight: 600;">Multi-Modal</td>
-                        <td>175 km</td>
-                        <td>25,059 km</td>
-                        <td>19,457 km</td>
-                    </tr>
-                </tbody>
+                <tbody id="results-body"></tbody>
             </table>
-
-            <div class="chart-container">
+            <div class="chart-container animate-in">
                 <h3>MAE Comparison (log scale)</h3>
-                <svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;">
-                    <!-- ISS Group -->
-                    <text x="10" y="36" fill="#90a4ae" font-size="12" font-family="sans-serif">ISS (LEO)</text>
-                    <rect x="110" y="14" width="170" height="16" rx="3" fill="#4fc3f7" opacity="0.85"/>
-                    <text x="286" y="27" fill="#b0bec5" font-size="11" font-family="sans-serif">126 km</text>
-                    <rect x="110" y="34" width="200" height="16" rx="3" fill="#7c4dff" opacity="0.85"/>
-                    <text x="316" y="47" fill="#b0bec5" font-size="11" font-family="sans-serif">295 km</text>
-                    <rect x="110" y="54" width="182" height="16" rx="3" fill="#ff4081" opacity="0.85"/>
-                    <text x="298" y="67" fill="#b0bec5" font-size="11" font-family="sans-serif">175 km</text>
-
-                    <!-- DSCOVR Group -->
-                    <text x="10" y="116" fill="#90a4ae" font-size="12" font-family="sans-serif">DSCOVR (L1)</text>
-                    <rect x="110" y="94" width="337" height="16" rx="3" fill="#4fc3f7" opacity="0.85"/>
-                    <text x="453" y="107" fill="#b0bec5" font-size="11" font-family="sans-serif">12,797 km</text>
-                    <rect x="110" y="114" width="345" height="16" rx="3" fill="#7c4dff" opacity="0.85"/>
-                    <text x="461" y="127" fill="#b0bec5" font-size="11" font-family="sans-serif">13,517 km</text>
-                    <rect x="110" y="134" width="358" height="16" rx="3" fill="#ff4081" opacity="0.85"/>
-                    <text x="474" y="147" fill="#b0bec5" font-size="11" font-family="sans-serif">25,059 km</text>
-
-                    <!-- MMS-1 Group -->
-                    <text x="10" y="196" fill="#90a4ae" font-size="12" font-family="sans-serif">MMS-1 (HEO)</text>
-                    <rect x="110" y="174" width="347" height="16" rx="3" fill="#4fc3f7" opacity="0.85"/>
-                    <text x="463" y="187" fill="#b0bec5" font-size="11" font-family="sans-serif">18,683 km</text>
-                    <rect x="110" y="194" width="349" height="16" rx="3" fill="#7c4dff" opacity="0.85"/>
-                    <text x="465" y="207" fill="#b0bec5" font-size="11" font-family="sans-serif">19,237 km</text>
-                    <rect x="110" y="214" width="349" height="16" rx="3" fill="#ff4081" opacity="0.85"/>
-                    <text x="465" y="227" fill="#b0bec5" font-size="11" font-family="sans-serif">19,457 km</text>
-
-                    <!-- Legend -->
-                    <rect x="110" y="245" width="12" height="12" rx="2" fill="#4fc3f7"/>
-                    <text x="126" y="256" fill="#90a4ae" font-size="11" font-family="sans-serif">LSTM</text>
-                    <rect x="180" y="245" width="12" height="12" rx="2" fill="#7c4dff"/>
-                    <text x="196" y="256" fill="#90a4ae" font-size="11" font-family="sans-serif">Transformer</text>
-                    <rect x="290" y="245" width="12" height="12" rx="2" fill="#ff4081"/>
-                    <text x="306" y="256" fill="#90a4ae" font-size="11" font-family="sans-serif">Multi-Modal</text>
-                </svg>
+                <svg id="mae-chart" viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;"></svg>
             </div>
         </div>
 
@@ -666,7 +662,7 @@
 
         <!-- Live ISS Tracker -->
         <div class="section">
-            <h2>Live ISS Tracker</h2>
+            <h2 class="animate-in">Live ISS Tracker</h2>
             <p style="color: #78909c; margin-bottom: 16px; font-size: 0.95em;">
                 Real-time International Space Station position on a 3D globe. Updated every 5 seconds.
             </p>
@@ -699,25 +695,25 @@
 
         <!-- Space Weather Dashboard -->
         <div class="section">
-            <h2>Space Weather</h2>
+            <h2 class="animate-in">Space Weather</h2>
             <p style="color: #78909c; margin-bottom: 16px; font-size: 0.95em;">
                 Current solar wind conditions from NOAA SWPC. These are the signals our multi-modal model uses to predict orbit perturbations.
             </p>
             <div class="weather-grid">
-                <div class="weather-card">
+                <div class="weather-card animate-in">
                     <div class="weather-label">Kp Index</div>
                     <div class="weather-value" id="wx-kp" style="color: #66bb6a;">--</div>
                     <div class="kp-bars" id="wx-kp-bars"></div>
                 </div>
-                <div class="weather-card">
+                <div class="weather-card animate-in">
                     <div class="weather-label">Solar Wind Speed</div>
                     <div class="weather-value" id="wx-speed" style="color: #4fc3f7;">-- <span class="weather-unit">km/s</span></div>
                 </div>
-                <div class="weather-card">
+                <div class="weather-card animate-in">
                     <div class="weather-label">IMF Bz</div>
                     <div class="weather-value" id="wx-bz" style="color: #4fc3f7;">-- <span class="weather-unit">nT</span></div>
                 </div>
-                <div class="weather-card">
+                <div class="weather-card animate-in">
                     <div class="weather-label">Storm Level</div>
                     <div class="weather-value" id="wx-storm" style="color: #66bb6a;">--</div>
                 </div>
@@ -726,7 +722,7 @@
 
         <!-- Try It - Prediction Demo -->
         <div class="section">
-            <h2>Try It</h2>
+            <h2 class="animate-in">Try It</h2>
             <p style="color: #78909c; margin-bottom: 16px; font-size: 0.95em;">
                 Run orbit predictions directly in your browser using our trained models on Hugging Face.
             </p>
@@ -736,9 +732,9 @@
         </div>
 
         <div class="section">
-            <h2>Data Pipeline</h2>
+            <h2 class="animate-in">Data Pipeline</h2>
             <div class="pipeline">
-                <div class="pipeline-step">
+                <div class="pipeline-step animate-in">
                     <div class="step-num">1</div>
                     <div class="step-content">
                         <h4>NASA SSC API + OMNI</h4>
@@ -746,7 +742,7 @@
                         wind parameters (IMF, flow speed, density, Kp, Dst) via cron.</p>
                     </div>
                 </div>
-                <div class="pipeline-step">
+                <div class="pipeline-step animate-in">
                     <div class="step-num">2</div>
                     <div class="step-content">
                         <h4>Preprocessing</h4>
@@ -754,7 +750,7 @@
                         creation. L1-to-Earth propagation delay correction for solar wind.</p>
                     </div>
                 </div>
-                <div class="pipeline-step">
+                <div class="pipeline-step animate-in">
                     <div class="step-num">3</div>
                     <div class="step-content">
                         <h4>Training</h4>
@@ -762,7 +758,7 @@
                         Temporal train/val/test split (70/15/15). Both PyTorch and TensorFlow.</p>
                     </div>
                 </div>
-                <div class="pipeline-step">
+                <div class="pipeline-step animate-in">
                     <div class="step-num">4</div>
                     <div class="step-content">
                         <h4>Evaluation</h4>
@@ -774,7 +770,7 @@
         </div>
 
         <div class="section">
-            <h2>Research</h2>
+            <h2 class="animate-in">Research</h2>
             <p style="color: #90a4ae; line-height: 1.7; max-width: 800px;">
                 We hypothesize that during geomagnetic storms, the thermosphere heats and
                 expands, increasing atmospheric drag on LEO satellites in ways that SGP4
@@ -846,6 +842,58 @@
     <script src="https://cdn.jsdelivr.net/npm/globe.gl"></script>
 
     <script>
+        // === Scroll Animations + Counters ===
+        function animateCounter(el) {
+            var target = parseInt(el.dataset.count);
+            var suffix = el.dataset.suffix || '';
+            var format = el.dataset.format || '';
+            var duration = 1500;
+            var start = performance.now();
+            function update(now) {
+                var elapsed = now - start;
+                var progress = Math.min(elapsed / duration, 1);
+                var eased = 1 - Math.pow(1 - progress, 3);
+                var current = Math.round(eased * target);
+                if (format === 'abbrev' && current >= 1000000) {
+                    el.textContent = (current / 1000000).toFixed(1) + 'M' + suffix;
+                } else if (format === 'abbrev' && current >= 1000) {
+                    el.textContent = (current / 1000).toFixed(0) + 'K' + suffix;
+                } else {
+                    el.textContent = current + suffix;
+                }
+                if (progress < 1) requestAnimationFrame(update);
+            }
+            requestAnimationFrame(update);
+        }
+
+        (function() {
+            var observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (!entry.isIntersecting) return;
+                    var el = entry.target;
+                    var parent = el.parentElement;
+                    if (parent && (parent.classList.contains('stats-grid') ||
+                        parent.classList.contains('spacecraft-grid') ||
+                        parent.classList.contains('models-section') ||
+                        parent.classList.contains('weather-grid'))) {
+                        var siblings = Array.from(parent.querySelectorAll('.animate-in'));
+                        var idx = siblings.indexOf(el);
+                        if (idx > 0) el.style.transitionDelay = (idx * 0.12) + 's';
+                    }
+                    if (el.classList.contains('pipeline-step')) {
+                        var steps = Array.from(el.parentElement.querySelectorAll('.pipeline-step'));
+                        var stepIdx = steps.indexOf(el);
+                        if (stepIdx > 0) el.style.transitionDelay = (stepIdx * 0.15) + 's';
+                    }
+                    el.classList.add('visible');
+                    var counters = el.querySelectorAll('[data-count]');
+                    counters.forEach(animateCounter);
+                    observer.unobserve(el);
+                });
+            }, { threshold: 0.15 });
+            document.querySelectorAll('.animate-in').forEach(function(el) { observer.observe(el); });
+        })();
+
         // === Live ISS Tracker ===
         const issTrail = [];
         const MAX_TRAIL = 40;
@@ -983,12 +1031,217 @@
             setInterval(fetchISS, 5000);
         }
 
+        // === Storm-Conditioned Toggle Table ===
+        var RESULTS_DATA = {
+            all: {
+                lstm:        { iss: '126 km', dscovr: '12,797 km', mms1: '18,683 km' },
+                transformer: { iss: '295 km', dscovr: '13,517 km', mms1: '19,237 km' },
+                multimodal:  { iss: '175 km', dscovr: '25,059 km', mms1: '19,457 km' },
+                sgp4:        { iss: 'TBD',    dscovr: 'TBD',       mms1: 'TBD' }
+            },
+            quiet: {
+                lstm:        { iss: 'TBD', dscovr: 'TBD', mms1: 'TBD' },
+                transformer: { iss: 'TBD', dscovr: 'TBD', mms1: 'TBD' },
+                multimodal:  { iss: 'TBD', dscovr: 'TBD', mms1: 'TBD' },
+                sgp4:        { iss: 'TBD', dscovr: 'TBD', mms1: 'TBD' }
+            },
+            active: {
+                lstm:        { iss: 'TBD', dscovr: 'TBD', mms1: 'TBD' },
+                transformer: { iss: 'TBD', dscovr: 'TBD', mms1: 'TBD' },
+                multimodal:  { iss: 'TBD', dscovr: 'TBD', mms1: 'TBD' },
+                sgp4:        { iss: 'TBD', dscovr: 'TBD', mms1: 'TBD' }
+            },
+            storm: {
+                lstm:        { iss: 'TBD', dscovr: 'TBD', mms1: 'TBD' },
+                transformer: { iss: 'TBD', dscovr: 'TBD', mms1: 'TBD' },
+                multimodal:  { iss: 'TBD', dscovr: 'TBD', mms1: 'TBD' },
+                sgp4:        { iss: 'TBD', dscovr: 'TBD', mms1: 'TBD' }
+            }
+        };
+
+        var MODEL_STYLES = {
+            lstm:        { label: 'LSTM',        color: '#4fc3f7' },
+            transformer: { label: 'Transformer', color: '#b388ff' },
+            multimodal:  { label: 'Multi-Modal', color: '#ff4081' },
+            sgp4:        { label: 'SGP4',        color: '#78909c' }
+        };
+
+        function parseKm(str) {
+            if (!str || str === 'TBD') return null;
+            return parseFloat(str.replace(/,/g, '').replace(' km', ''));
+        }
+
+        function toggleCondition(condition, clickedBtn) {
+            document.querySelectorAll('.toggle-btn').forEach(function(btn) {
+                btn.classList.remove('active');
+            });
+            if (clickedBtn) clickedBtn.classList.add('active');
+            else document.querySelector('.toggle-btn').classList.add('active');
+
+            var data = RESULTS_DATA[condition];
+            var tbody = document.getElementById('results-body');
+            while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
+
+            var best = { iss: Infinity, dscovr: Infinity, mms1: Infinity };
+            for (var m in data) {
+                ['iss', 'dscovr', 'mms1'].forEach(function(sc) {
+                    var val = parseKm(data[m][sc]);
+                    if (val !== null && val < best[sc]) best[sc] = val;
+                });
+            }
+
+            for (var model in data) {
+                var style = MODEL_STYLES[model];
+                var tr = document.createElement('tr');
+                var tdName = document.createElement('td');
+                tdName.style.color = style.color;
+                tdName.style.fontWeight = '600';
+                tdName.textContent = style.label;
+                tr.appendChild(tdName);
+                ['iss', 'dscovr', 'mms1'].forEach(function(sc) {
+                    var td = document.createElement('td');
+                    td.textContent = data[model][sc];
+                    var val = parseKm(data[model][sc]);
+                    if (val !== null && val === best[sc]) td.className = 'best-value';
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            }
+            updateChart(condition);
+        }
+
+        function updateChart(condition) {
+            var data = RESULTS_DATA[condition];
+            var svg = document.getElementById('mae-chart');
+            var models = ['lstm', 'transformer', 'multimodal'];
+            var spacecrafts = [
+                { key: 'iss', label: 'ISS (LEO)', y: 14 },
+                { key: 'dscovr', label: 'DSCOVR (L1)', y: 94 },
+                { key: 'mms1', label: 'MMS-1 (HEO)', y: 174 }
+            ];
+
+            var maxVal = 0;
+            spacecrafts.forEach(function(sc) {
+                models.forEach(function(m) {
+                    var val = parseKm(data[m][sc.key]);
+                    if (val !== null && val > maxVal) maxVal = val;
+                });
+            });
+            if (maxVal === 0) maxVal = 30000;
+
+            var ns = 'http://www.w3.org/2000/svg';
+            while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+            spacecrafts.forEach(function(sc) {
+                var label = document.createElementNS(ns, 'text');
+                label.setAttribute('x', '10');
+                label.setAttribute('y', String(sc.y + 22));
+                label.setAttribute('fill', '#90a4ae');
+                label.setAttribute('font-size', '12');
+                label.setAttribute('font-family', 'sans-serif');
+                label.textContent = sc.label;
+                svg.appendChild(label);
+
+                models.forEach(function(m, mi) {
+                    var val = parseKm(data[m][sc.key]);
+                    if (val === null) return;
+                    var barWidth = Math.max(20, (Math.log10(val) / Math.log10(maxVal)) * 400);
+                    var barY = sc.y + mi * 20;
+
+                    var rect = document.createElementNS(ns, 'rect');
+                    rect.setAttribute('x', '110');
+                    rect.setAttribute('y', String(barY));
+                    rect.setAttribute('width', String(barWidth));
+                    rect.setAttribute('height', '16');
+                    rect.setAttribute('rx', '3');
+                    rect.setAttribute('fill', MODEL_STYLES[m].color);
+                    rect.setAttribute('opacity', '0.85');
+                    svg.appendChild(rect);
+
+                    var txt = document.createElementNS(ns, 'text');
+                    txt.setAttribute('x', String(115 + barWidth));
+                    txt.setAttribute('y', String(barY + 13));
+                    txt.setAttribute('fill', '#b0bec5');
+                    txt.setAttribute('font-size', '11');
+                    txt.setAttribute('font-family', 'sans-serif');
+                    txt.textContent = data[m][sc.key];
+                    svg.appendChild(txt);
+                });
+            });
+
+            // Legend
+            var legendItems = [
+                { x: 110, color: '#4fc3f7', label: 'LSTM' },
+                { x: 180, color: '#7c4dff', label: 'Transformer' },
+                { x: 290, color: '#ff4081', label: 'Multi-Modal' }
+            ];
+            legendItems.forEach(function(item) {
+                var r = document.createElementNS(ns, 'rect');
+                r.setAttribute('x', String(item.x));
+                r.setAttribute('y', '245');
+                r.setAttribute('width', '12');
+                r.setAttribute('height', '12');
+                r.setAttribute('rx', '2');
+                r.setAttribute('fill', item.color);
+                svg.appendChild(r);
+                var t = document.createElementNS(ns, 'text');
+                t.setAttribute('x', String(item.x + 16));
+                t.setAttribute('y', '256');
+                t.setAttribute('fill', '#90a4ae');
+                t.setAttribute('font-size', '11');
+                t.setAttribute('font-family', 'sans-serif');
+                t.textContent = item.label;
+                svg.appendChild(t);
+            });
+        }
+
+        // === Prediction Overlay ===
+        function loadPredictionOverlay() {
+            fetch('predictions.json')
+                .then(function(r) { return r.ok ? r.json() : null; })
+                .then(function(data) {
+                    if (!data || !data.path || !data.generated_at) return;
+                    var generatedAt = new Date(data.generated_at);
+                    var ageMs = Date.now() - generatedAt.getTime();
+                    if (ageMs > 2 * 60 * 60 * 1000) return;
+                    var valid = data.path.every(function(p) {
+                        return p.lat >= -90 && p.lat <= 90 &&
+                               p.lng >= -180 && p.lng <= 180 &&
+                               p.alt >= 300 && p.alt <= 500;
+                    });
+                    if (!valid) return;
+                    var arcs = [];
+                    for (var i = 0; i < data.path.length - 1; i++) {
+                        arcs.push({
+                            startLat: data.path[i].lat,
+                            startLng: data.path[i].lng,
+                            endLat: data.path[i + 1].lat,
+                            endLng: data.path[i + 1].lng,
+                            color: 'rgba(79, 195, 247, 0.35)'
+                        });
+                    }
+                    if (window.issGlobe) {
+                        window.issGlobe
+                            .arcsData(arcs)
+                            .arcColor('color')
+                            .arcDashLength(0.4)
+                            .arcDashGap(0.2)
+                            .arcStroke(0.5);
+                    }
+                })
+                .catch(function() {});
+        }
+
         // === Start everything ===
         fetchWeather();
         setInterval(fetchWeather, 300000); // 5 minutes
 
         // Initialize globe (Globe.GL loaded synchronously above)
         initGlobe();
+        loadPredictionOverlay();
+
+        // Initialize toggle table
+        toggleCondition('all', null);
     </script>
 </body>
 </html>
