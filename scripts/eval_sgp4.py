@@ -89,6 +89,10 @@ def compute_kepler_mae(spacecraft_id, config):
         distances = np.sqrt(np.sum((pred - test_targets[i])**2, axis=-1))
         all_distances.append(distances)
 
+    if not all_distances:
+        log.warning(f"{spacecraft_id}: no valid test windows (data may be too sparse)")
+        return float("nan")
+
     all_distances = np.concatenate(all_distances)
     mae = float(np.mean(all_distances))
     rmse = float(np.sqrt(np.mean(all_distances**2)))

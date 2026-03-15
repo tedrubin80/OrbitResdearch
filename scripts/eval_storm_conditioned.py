@@ -52,7 +52,8 @@ def load_model(model_type, checkpoint_path, input_dim=6, solar_dim=8):
         hidden_dim = state["input_proj.weight"].shape[0]
         layer_keys = [k for k in state if "layers." in k and "self_attn.in_proj_weight" in k]
         num_layers = len(layer_keys)
-        nhead = state["encoder.layers.0.self_attn.in_proj_weight"].shape[0] // hidden_dim
+        # nhead must divide hidden_dim; train_gpu.py uses 8
+        nhead = 8 if hidden_dim % 8 == 0 else 4
         fc_keys = sorted([k for k in state if k.startswith("head.") and k.endswith(".weight")])
         horizon = state[fc_keys[-1]].shape[0] // 3
         ff_dim = state["encoder.layers.0.linear1.weight"].shape[0]
@@ -80,10 +81,18 @@ def load_model(model_type, checkpoint_path, input_dim=6, solar_dim=8):
 
 def assign_kp(window_times, solar_df):
     """Assign preceding Kp to each window start time."""
-    kp_df = solar_df[["time", "kp"]].dropna(subset=["kp"]).sort_values("time").drop_duplicates("time")
-    windows_df = pd.DataFrame({"time": pd.to_datetime(window_times)}).sort_values("time")
+    kp_df = solar_df[["time", "kp"]].dropna(subset=["kp"]).copy()
+    kp_df["time"] = pd.to_datetime(kp_df["time"], utc=True).dt.tz_localize(None).astype("datetime64[ns]")
+    kp_df = kp_df.sort_values("time").drop_duplicates("time")
+    windows_df = pd.DataFrame({"time": pd.to_datetime(window_times).astype("datetime64[ns]")})
+    windows_df["time"] = windows_df["time"].dt.tz_localize(None)
+    windows_df = windows_df.sort_values("time")
     merged = pd.merge_asof(windows_df, kp_df, on="time", direction="backward")
-    return merged["kp"].values
+    kp_vals = merged["kp"].values
+    # OMNI stores Kp*10 (0-90 scale). Convert to standard 0-9 scale.
+    if np.nanmax(kp_vals) > 9:
+        kp_vals = kp_vals / 10.0
+    return kp_vals
 
 
 def run_spacecraft(spacecraft_id, config):
@@ -220,7 +229,11 @@ def run_spacecraft(spacecraft_id, config):
                 tgts_km[..., i] = tgts[..., i] * std + mean
 
             distances = np.sqrt(np.sum((preds_km - tgts_km)**2, axis=-1))
-            mae = round(float(np.mean(distances)), 1)
+            valid = np.isfinite(distances)
+            if valid.any():
+                mae = round(float(np.nanmean(distances[valid])), 1)
+            else:
+                mae = None
             cond_results[cond_name] = mae
             log.info(f"    {cond_name} (n={n}): {mae:.1f} km")
 
