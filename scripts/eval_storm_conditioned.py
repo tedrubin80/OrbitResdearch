@@ -89,8 +89,10 @@ def assign_kp(window_times, solar_df):
     windows_df = windows_df.sort_values("time")
     merged = pd.merge_asof(windows_df, kp_df, on="time", direction="backward")
     kp_vals = merged["kp"].values
+    if len(kp_vals) == 0:
+        return kp_vals
     # OMNI stores Kp*10 (0-90 scale). Convert to standard 0-9 scale.
-    if np.nanmax(kp_vals) > 9:
+    if np.nanmax(kp_vals[np.isfinite(kp_vals)]) > 9:
         kp_vals = kp_vals / 10.0
     return kp_vals
 
@@ -128,6 +130,10 @@ def run_spacecraft(spacecraft_id, config):
             targets.append(tgts[i + input_steps:i + input_steps + horizon_steps])
             window_times.append(times[i + input_steps])
 
+    if not inputs:
+        log.warning(f"{spacecraft_id}: no valid windows (data too sparse)")
+        return {}
+
     inputs = np.array(inputs, dtype=np.float32)
     targets = np.array(targets, dtype=np.float32)
     window_times = np.array(window_times)
@@ -136,6 +142,10 @@ def run_spacecraft(spacecraft_id, config):
     test_inputs = inputs[test_start:]
     test_targets = targets[test_start:]
     test_times = window_times[test_start:]
+
+    if len(test_inputs) == 0:
+        log.warning(f"{spacecraft_id}: empty test set")
+        return {}
 
     sw_path = Path("data/raw/solar_wind_2023-01-01_2025-12-31.parquet")
     solar_df = pd.read_parquet(sw_path)
