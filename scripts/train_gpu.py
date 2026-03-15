@@ -628,16 +628,18 @@ def run_for_spacecraft(spacecraft, models_to_run, subsample=1, horizon_hours=6):
     if "lstm" in models_to_run:
         log.info(f"\n--- LSTM ({spacecraft}) ---")
         model = OrbitLSTMDirect(input_dim, hidden_dim=128, num_layers=3, horizon=horizon, output_dim=output_dim)
-        model, _ = train_single(model, train_dl, val_dl, f"lstm_{spacecraft}_6h", epochs=100, patience=15)
-        results["lstm"] = evaluate(model, test_dl, orbit_stats, f"LSTM ({spacecraft})")
+        ckpt_name = f"lstm_{spacecraft}_{horizon_hours}h"
+        model, _ = train_single(model, train_dl, val_dl, ckpt_name, epochs=100, patience=15)
+        results["lstm"] = evaluate(model, test_dl, orbit_stats, f"LSTM ({spacecraft} {horizon_hours}h)")
 
     # Transformer
     if "transformer" in models_to_run:
         log.info(f"\n--- Transformer ({spacecraft}) ---")
         model = OrbitTransformerDirect(input_dim, d_model=128, nhead=8, num_layers=4, dim_feedforward=512,
                                        horizon=horizon, output_dim=output_dim)
-        model, _ = train_single(model, train_dl, val_dl, f"transformer_{spacecraft}_6h", epochs=100, patience=15)
-        results["transformer"] = evaluate(model, test_dl, orbit_stats, f"Transformer ({spacecraft})")
+        ckpt_name = f"transformer_{spacecraft}_{horizon_hours}h"
+        model, _ = train_single(model, train_dl, val_dl, ckpt_name, epochs=100, patience=15)
+        results["transformer"] = evaluate(model, test_dl, orbit_stats, f"Transformer ({spacecraft} {horizon_hours}h)")
 
     # Multi-modal
     if "multimodal" in models_to_run:
@@ -666,8 +668,9 @@ def run_for_spacecraft(spacecraft, models_to_run, subsample=1, horizon_hours=6):
             hidden_dim=128, num_layers=3, nhead=8,
             horizon=t_wins.shape[1], output_dim=t_wins.shape[-1],
         )
-        model, _ = train_multimodal(model, mm_train, mm_val, f"multimodal_{spacecraft}_6h", epochs=100, patience=15)
-        results["multimodal"] = evaluate(model, mm_test, orbit_stats, f"Multi-Modal ({spacecraft})", multimodal=True)
+        ckpt_name = f"multimodal_{spacecraft}_{horizon_hours}h"
+        model, _ = train_multimodal(model, mm_train, mm_val, ckpt_name, epochs=100, patience=15)
+        results["multimodal"] = evaluate(model, mm_test, orbit_stats, f"Multi-Modal ({spacecraft} {horizon_hours}h)", multimodal=True)
 
     return results
 
@@ -696,6 +699,7 @@ def main():
     parser.add_argument("--subsample", type=int, default=1, help="1=full 1-min, 5=5-min, 10=10-min")
     parser.add_argument("--no-push", action="store_true")
     parser.add_argument("--hf-token", type=str, default=None, help="HF API token for pushing checkpoints")
+    parser.add_argument("--horizon-hours", type=int, default=6, help="Prediction horizon in hours (1, 3, or 6)")
     args = parser.parse_args()
 
     start = time.time()
@@ -707,6 +711,7 @@ def main():
             log.info(f"  GPU {i}: {torch.cuda.get_device_name(i)} ({torch.cuda.get_device_properties(i).total_memory / 1e9:.0f} GB)")
     log.info(f"PyTorch: {torch.__version__}")
     log.info(f"Subsample: {args.subsample}x")
+    log.info(f"Horizon: {args.horizon_hours}h")
     log.info("=" * 60)
 
     models = [args.model] if args.model else ["lstm", "transformer", "multimodal"]
@@ -715,7 +720,7 @@ def main():
     all_results = {}
     for sc in spacecraft_list:
         try:
-            all_results[sc] = run_for_spacecraft(sc, models, args.subsample)
+            all_results[sc] = run_for_spacecraft(sc, models, args.subsample, args.horizon_hours)
         except Exception as e:
             log.error(f"{sc} failed: {e}\n{traceback.format_exc()}")
 
