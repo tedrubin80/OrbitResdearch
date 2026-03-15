@@ -290,6 +290,15 @@ residual gated design (Figure~\ref{fig:architecture}) that provides a
 structural guarantee: the multi-modal model can never underperform the
 orbit-only LSTM baseline.
 
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{figures/architecture.png}
+\caption{Residual gated multi-modal architecture. The orbit branch (blue)
+produces a base prediction; the solar wind branch (red) produces a perturbation
+via cross-attention; a sigmoid gate (green) controls how much correction to apply.}
+\label{fig:architecture}
+\end{figure}
+
 \textbf{Architecture.} The model consists of six components:
 
 \begin{enumerate}
@@ -412,8 +421,17 @@ metric.
 
 \subsection{Overall Performance}
 
-Table~\ref{tab:results_all} presents 6-hour prediction MAE for all
-model--spacecraft combinations.
+Table~\ref{tab:results_all} and Figure~\ref{fig:mae} present 6-hour
+prediction MAE for all model--spacecraft combinations.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{figures/mae_comparison.png}
+\caption{6-hour prediction MAE comparison across all models for ISS (left)
+and MMS-1 (right). Note the SGP4 Keplerian baseline is 4.6$\times$ worse
+than LSTM on ISS but competitive on MMS-1.}
+\label{fig:mae}
+\end{figure}
 
 \begin{table}[h]
 \centering
@@ -533,8 +551,9 @@ Ensemble    & 126 & 126 & 124 & \textbf{111} \\
 \end{tabular}
 \end{table}
 
-All models improve during storm conditions, but the multi-modal model
-shows the largest relative improvement: 17\% (164$\rightarrow$135~km)
+Figure~\ref{fig:storm} visualizes these results. All models improve
+during storm conditions, but the multi-modal model shows the largest
+relative improvement: 17\% (164$\rightarrow$135~km)
 compared to LSTM's 10\% (126$\rightarrow$113~km). This supports the
 hypothesis that the cross-attention fusion learns meaningful solar wind
 corrections, particularly for the atmospheric drag perturbations that
@@ -542,14 +561,32 @@ dominate during geomagnetic storms.
 
 The ensemble (simple average of LSTM and multi-modal predictions)
 achieves the best storm-time performance at 111~km, suggesting the
-two models capture complementary information. The small storm sample
+two models capture complementary information.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\columnwidth]{figures/storm_vs_quiet.png}
+\caption{ISS 6-hour MAE by geomagnetic condition. The multi-modal model
+shows the largest improvement during storms (17\%), supporting the
+solar wind hypothesis.}
+\label{fig:storm}
+\end{figure} The small storm sample
 ($n$=7) limits statistical power, but the consistent pattern across
 all models---improving from quiet to storm---is encouraging.
 
 \subsection{Prediction Horizon Analysis}
 
-Table~\ref{tab:horizons} shows how prediction accuracy degrades with
-longer horizons for ISS.
+Table~\ref{tab:horizons} and Figure~\ref{fig:horizon} show how
+prediction accuracy degrades with longer horizons for ISS.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.85\columnwidth]{figures/horizon_comparison.png}
+\caption{ISS MAE vs.\ prediction horizon. LSTM error grows linearly;
+multi-modal error remains roughly constant, suggesting a fixed-offset
+correction rather than temporal refinement.}
+\label{fig:horizon}
+\end{figure}
 
 \begin{table}[h]
 \centering
