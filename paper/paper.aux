@@ -37,36 +37,51 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Residual Gated Multi-Modal Fusion}{3}{subsection.4.4}\protected@file@percent }
 \newlabel{sec:multimodal}{{4.4}{3}{Residual Gated Multi-Modal Fusion}{subsection.4.4}{}}
 \citation{loshchilov2019decoupled}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Residual gated multi-modal architecture. The orbit branch (blue) produces a base prediction; the solar wind branch (red) produces a perturbation via cross-attention; a sigmoid gate (green) controls how much correction to apply.}}{4}{figure.caption.2}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{fig:architecture}{{1}{4}{Residual gated multi-modal architecture. The orbit branch (blue) produces a base prediction; the solar wind branch (red) produces a perturbation via cross-attention; a sigmoid gate (green) controls how much correction to apply}{figure.caption.2}{}}
 \newlabel{eq:residual}{{8}{4}{Residual Gated Multi-Modal Fusion}{equation.4.8}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {5}Experiments}{4}{section.5}\protected@file@percent }
 \newlabel{sec:experiments}{{5}{4}{Experiments}{section.5}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Experimental Setup}{4}{subsection.5.1}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Model hyperparameters}}{4}{table.caption.2}\protected@file@percent }
-\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
-\newlabel{tab:hyperparams}{{1}{4}{Model hyperparameters}{table.caption.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Evaluation Metrics}{4}{subsection.5.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {6}Results}{4}{section.6}\protected@file@percent }
-\newlabel{sec:results}{{6}{4}{Results}{section.6}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Overall Performance}{4}{subsection.6.1}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces 6-hour prediction MAE (km) for each model and spacecraft. Bold indicates best result per spacecraft.}}{5}{table.caption.3}\protected@file@percent }
-\newlabel{tab:results_all}{{2}{5}{6-hour prediction MAE (km) for each model and spacecraft. Bold indicates best result per spacecraft}{table.caption.3}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Model hyperparameters}}{5}{table.caption.3}\protected@file@percent }
+\newlabel{tab:hyperparams}{{1}{5}{Model hyperparameters}{table.caption.3}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Results}{5}{section.6}\protected@file@percent }
+\newlabel{sec:results}{{6}{5}{Results}{section.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Overall Performance}{5}{subsection.6.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces 6-hour prediction MAE comparison across all models for ISS (left) and MMS-1 (right). Note the SGP4 Keplerian baseline is 4.6$\times $ worse than LSTM on ISS but competitive on MMS-1.}}{5}{figure.caption.4}\protected@file@percent }
+\newlabel{fig:mae}{{2}{5}{6-hour prediction MAE comparison across all models for ISS (left) and MMS-1 (right). Note the SGP4 Keplerian baseline is 4.6$\times $ worse than LSTM on ISS but competitive on MMS-1}{figure.caption.4}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces 6-hour prediction MAE (km) for each model and spacecraft. Bold indicates best result per spacecraft.}}{5}{table.caption.5}\protected@file@percent }
+\newlabel{tab:results_all}{{2}{5}{6-hour prediction MAE (km) for each model and spacecraft. Bold indicates best result per spacecraft}{table.caption.5}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Multi-Modal Architecture Evolution}{5}{subsection.6.2}\protected@file@percent }
 \newlabel{sec:evolution}{{6.2}{5}{Multi-Modal Architecture Evolution}{subsection.6.2}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Multi-modal ISS MAE across architecture versions.}}{5}{table.caption.4}\protected@file@percent }
-\newlabel{tab:evolution}{{3}{5}{Multi-modal ISS MAE across architecture versions}{table.caption.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}Orbit Regime Analysis}{5}{subsection.6.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.4}Ablation Studies}{5}{subsection.6.4}\protected@file@percent }
-\newlabel{sec:ablation}{{6.4}{5}{Ablation Studies}{subsection.6.4}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Multi-modal ISS MAE across architecture versions.}}{5}{table.caption.6}\protected@file@percent }
+\newlabel{tab:evolution}{{3}{5}{Multi-modal ISS MAE across architecture versions}{table.caption.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}Orbit Regime Analysis}{6}{subsection.6.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.4}Storm-Conditioned Evaluation}{6}{subsection.6.4}\protected@file@percent }
+\newlabel{sec:storm}{{6.4}{6}{Storm-Conditioned Evaluation}{subsection.6.4}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces ISS 6-hour MAE (km) by geomagnetic condition. $n$ denotes the number of test windows per condition.}}{6}{table.caption.7}\protected@file@percent }
+\newlabel{tab:storm}{{4}{6}{ISS 6-hour MAE (km) by geomagnetic condition. $n$ denotes the number of test windows per condition}{table.caption.7}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces ISS 6-hour MAE by geomagnetic condition. The multi-modal model shows the largest improvement during storms (17\%), supporting the solar wind hypothesis.}}{6}{figure.caption.8}\protected@file@percent }
+\newlabel{fig:storm}{{3}{6}{ISS 6-hour MAE by geomagnetic condition. The multi-modal model shows the largest improvement during storms (17\%), supporting the solar wind hypothesis}{figure.caption.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.5}Prediction Horizon Analysis}{6}{subsection.6.5}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces ISS MAE vs.\ prediction horizon. LSTM error grows linearly; multi-modal error remains roughly constant, suggesting a fixed-offset correction rather than temporal refinement.}}{6}{figure.caption.9}\protected@file@percent }
+\newlabel{fig:horizon}{{4}{6}{ISS MAE vs.\ prediction horizon. LSTM error grows linearly; multi-modal error remains roughly constant, suggesting a fixed-offset correction rather than temporal refinement}{figure.caption.9}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces ISS MAE (km) by prediction horizon.}}{6}{table.caption.10}\protected@file@percent }
+\newlabel{tab:horizons}{{5}{6}{ISS MAE (km) by prediction horizon}{table.caption.10}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.6}Ablation Studies}{7}{subsection.6.6}\protected@file@percent }
+\newlabel{sec:ablation}{{6.6}{7}{Ablation Studies}{subsection.6.6}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Discussion}{7}{section.7}\protected@file@percent }
+\newlabel{sec:discussion}{{7}{7}{Discussion}{section.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Why LSTM Outperforms Transformers}{7}{subsection.7.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Limitations}{7}{subsection.7.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Implications}{7}{subsection.7.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {8}Conclusion}{7}{section.8}\protected@file@percent }
+\newlabel{sec:conclusion}{{8}{7}{Conclusion}{section.8}{}}
 \bibstyle{plainnat}
 \bibdata{references}
 \bibcite{bruinsma2004thermosphere}{{1}{2003}{{Bruinsma et~al.}}{{Bruinsma, Thuillier, and Barlier}}}
-\@writefile{toc}{\contentsline {section}{\numberline {7}Discussion}{6}{section.7}\protected@file@percent }
-\newlabel{sec:discussion}{{7}{6}{Discussion}{section.7}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Why LSTM Outperforms Transformers}{6}{subsection.7.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Limitations}{6}{subsection.7.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Implications}{6}{subsection.7.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {8}Conclusion}{6}{section.8}\protected@file@percent }
-\newlabel{sec:conclusion}{{8}{6}{Conclusion}{section.8}{}}
 \bibcite{gonzalez1994geomagnetic}{{2}{1994}{{Gonzalez et~al.}}{{Gonzalez, Joselyn, Kamide, Kroehl, Rostoker, Tsurutani, and Vasyliunas}}}
 \bibcite{king2005solar}{{3}{2005}{{King and Papitashvili}}{{}}}
 \bibcite{licata2022machine}{{4}{2022}{{Licata and Mehta}}{{}}}
@@ -76,4 +91,4 @@
 \bibcite{vallado2006revisiting}{{8}{2006}{{Vallado et~al.}}{{Vallado, Crawford, Hujsak, and Kelso}}}
 \bibcite{vaswani2017attention}{{9}{2017}{{Vaswani et~al.}}{{Vaswani, Shazeer, Parmar, Uszkoreit, Jones, Gomez, Kaiser, and Polosukhin}}}
 \bibcite{zhou2021informer}{{10}{2021}{{Zhou et~al.}}{{Zhou, Zhang, Peng, Zhang, Li, Xiong, and Zhang}}}
-\gdef \@abspage@last{7}
+\gdef \@abspage@last{8}
