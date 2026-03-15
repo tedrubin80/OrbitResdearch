@@ -1,0 +1,44 @@
+{
+  "lstm": {
+    "iss": {
+      "all": 125.1,
+      "quiet": 125.5,
+      "active": 122.1,
+      "storm": 112.7
+    },
+    "mms1": {
+      "all": 18832.4,
+      "quiet": 18600.5,
+      "active": 19855.6,
+      "storm": 19615.6
+    }
+  },
+  "transformer": {
+    "iss": {
+      "all": 282.0,
+      "quiet": 283.6,
+      "active": 280.0,
+      "storm": 255.4
+    },
+    "mms1": {
+      "all": 19295.8,
+      "quiet": 19406.2,
+      "active": 19592.2,
+      "storm": 23395.9
+    }
+  },
+  "multimodal": {
+    "iss": {
+      "all": 162.7,
+      "quiet": 163.9,
+      "active": 157.7,
+      "storm": 135.4
+    },
+    "mms1": {
+      "all": 19277.0,
+      "quiet": 19104.2,
+      "active": 21624.9,
+      "storm": 22810.3
+    }
+  }
+}

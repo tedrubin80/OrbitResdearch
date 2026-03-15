@@ -1034,28 +1034,28 @@
         // === Storm-Conditioned Toggle Table ===
         var RESULTS_DATA = {
             all: {
-                lstm:        { iss: '126 km', dscovr: '12,797 km', mms1: '18,683 km' },
-                transformer: { iss: '295 km', dscovr: '13,517 km', mms1: '19,237 km' },
-                multimodal:  { iss: '175 km', dscovr: '25,059 km', mms1: '19,457 km' },
-                sgp4:        { iss: 'TBD',    dscovr: 'TBD',       mms1: 'TBD' }
+                lstm:        { iss: '125 km',   dscovr: '12,797 km', mms1: '18,832 km' },
+                transformer: { iss: '282 km',   dscovr: '13,517 km', mms1: '19,296 km' },
+                multimodal:  { iss: '163 km',   dscovr: '25,059 km', mms1: '19,277 km' },
+                sgp4:        { iss: '575 km',   dscovr: '--',        mms1: '88 km' }
             },
             quiet: {
-                lstm:        { iss: 'TBD', dscovr: 'TBD', mms1: 'TBD' },
-                transformer: { iss: 'TBD', dscovr: 'TBD', mms1: 'TBD' },
-                multimodal:  { iss: 'TBD', dscovr: 'TBD', mms1: 'TBD' },
-                sgp4:        { iss: 'TBD', dscovr: 'TBD', mms1: 'TBD' }
+                lstm:        { iss: '126 km',   dscovr: '--', mms1: '18,601 km' },
+                transformer: { iss: '284 km',   dscovr: '--', mms1: '19,406 km' },
+                multimodal:  { iss: '164 km',   dscovr: '--', mms1: '19,104 km' },
+                sgp4:        { iss: '575 km',   dscovr: '--', mms1: '88 km' }
             },
             active: {
-                lstm:        { iss: 'TBD', dscovr: 'TBD', mms1: 'TBD' },
-                transformer: { iss: 'TBD', dscovr: 'TBD', mms1: 'TBD' },
-                multimodal:  { iss: 'TBD', dscovr: 'TBD', mms1: 'TBD' },
-                sgp4:        { iss: 'TBD', dscovr: 'TBD', mms1: 'TBD' }
+                lstm:        { iss: '122 km',   dscovr: '--', mms1: '19,856 km' },
+                transformer: { iss: '280 km',   dscovr: '--', mms1: '19,592 km' },
+                multimodal:  { iss: '158 km',   dscovr: '--', mms1: '21,625 km' },
+                sgp4:        { iss: '575 km',   dscovr: '--', mms1: '88 km' }
             },
             storm: {
-                lstm:        { iss: 'TBD', dscovr: 'TBD', mms1: 'TBD' },
-                transformer: { iss: 'TBD', dscovr: 'TBD', mms1: 'TBD' },
-                multimodal:  { iss: 'TBD', dscovr: 'TBD', mms1: 'TBD' },
-                sgp4:        { iss: 'TBD', dscovr: 'TBD', mms1: 'TBD' }
+                lstm:        { iss: '113 km',   dscovr: '--', mms1: '19,616 km' },
+                transformer: { iss: '255 km',   dscovr: '--', mms1: '23,396 km' },
+                multimodal:  { iss: '135 km',   dscovr: '--', mms1: '22,810 km' },
+                sgp4:        { iss: '575 km',   dscovr: '--', mms1: '88 km' }
             }
         };
 
@@ -1067,7 +1067,7 @@
         };
 
         function parseKm(str) {
-            if (!str || str === 'TBD') return null;
+            if (!str || str === 'TBD' || str === '--') return null;
             return parseFloat(str.replace(/,/g, '').replace(' km', ''));
         }
 
