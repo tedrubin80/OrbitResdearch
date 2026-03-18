@@ -278,10 +278,29 @@ def preprocess_orbit(df, spacecraft_id):
 
 
 def preprocess_solar_wind(df):
-    """Normalize solar wind parameters."""
+    """Normalize solar wind parameters.
+
+    Forward-fill strategy by variable type:
+    - Native 1-min (bx_gse, by_gse, bz_gse, flow_speed, proton_density,
+      clock_angle_sin, clock_angle_cos, dynamic_pressure): ffill limit=30 (30 min gaps)
+    - Hourly/3-hourly indices (kp, dst, ae, al, au): ffill limit=180 (3h gaps)
+      These are geophysical indices reported at coarser cadence — forward-fill
+      is physically correct (NOT linear interpolation, which would imply a
+      smooth ramp between e.g. Kp=2 and Kp=7 that doesn't exist).
+    """
     df = df.copy().sort_values("time").reset_index(drop=True)
     param_cols = [c for c in df.columns if c != "time"]
-    df[param_cols] = df[param_cols].ffill(limit=30)
+
+    # Index variables: forward-fill with larger tolerance (up to 3h)
+    index_cols = [c for c in ["kp", "dst", "ae", "al", "au"] if c in param_cols]
+    # Native 1-min + derived columns: forward-fill with smaller tolerance
+    native_cols = [c for c in param_cols if c not in index_cols]
+
+    if native_cols:
+        df[native_cols] = df[native_cols].ffill(limit=30)
+    if index_cols:
+        df[index_cols] = df[index_cols].ffill(limit=180)
+
     stats = {"mean": df[param_cols].mean().to_dict(), "std": df[param_cols].std().to_dict()}
     for col in param_cols:
         std = stats["std"].get(col, 0)

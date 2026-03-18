@@ -74,7 +74,10 @@ class SolarWindClient:
             combined = plasma_df
             if indices_df is not None and len(indices_df) > 0:
                 # Rename index columns for clarity
-                rename_map = {"KP1800": "kp", "DST1800": "dst", "AE1800": "ae"}
+                rename_map = {
+                    "KP1800": "kp", "DST1800": "dst", "AE1800": "ae",
+                    "AL_INDEX": "al", "AU_INDEX": "au",
+                }
                 indices_df = indices_df.rename(columns={
                     k: v for k, v in rename_map.items() if k in indices_df.columns
                 })
@@ -103,11 +106,14 @@ class SolarWindClient:
 
         # Drop extra columns from CDAWeb (Epoch, duplicate index columns)
         keep_cols = ["time", "bx_gse", "by_gse", "bz_gse",
-                     "flow_speed", "proton_density", "kp", "dst", "ae"]
+                     "flow_speed", "proton_density", "kp", "dst", "ae", "al", "au"]
         combined = combined[[c for c in keep_cols if c in combined.columns]]
 
         # Clean fill values
         combined = self._clean_fill_values(combined)
+
+        # Derive computed features from existing columns
+        combined = self._add_derived_features(combined)
 
         combined.to_parquet(cache_file, index=False)
         print(f"Cached {len(combined)} solar wind records to {cache_file}")
@@ -185,21 +191,57 @@ class SolarWindClient:
             return None
 
     def _clean_fill_values(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Replace OMNI fill values with NaN."""
+        """Replace OMNI fill values with NaN.
+
+        OMNI uses specific large values to indicate missing data.
+        See https://omniweb.gsfc.nasa.gov/html/HROdocum.html
+        """
         fill_thresholds = {
+            # Native 1-minute resolution (OMNI_HRO_1MIN)
             "flow_speed": 99999.0,
             "proton_density": 999.0,
             "bx_gse": 9999.0,
             "by_gse": 9999.0,
             "bz_gse": 9999.0,
+            # Hourly cadence indices (OMNI2_H0_MRG1HR), forward-filled to 1-min
             "kp": 90.0,
             "dst": 99999.0,
             "ae": 9999.0,
+            "al": 99999.0,
+            "au": 99999.0,
         }
 
         for col, threshold in fill_thresholds.items():
             if col in df.columns:
                 df.loc[df[col].abs() >= threshold, col] = np.nan
+
+        return df
+
+    def _add_derived_features(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Add physically-derived features from existing columns.
+
+        Features added:
+        - clock_angle_sin, clock_angle_cos: sin/cos decomposition of IMF clock
+          angle arctan2(By, Bz). Controls magnetopause reconnection efficiency.
+          Decomposed to avoid discontinuity at +/-pi that breaks z-score normalization.
+        - dynamic_pressure: 0.5 * n * v^2 in nPa (using proton mass).
+          Controls magnetopause standoff distance and compression.
+
+        Note: F10.7 solar flux is NOT included because it is only available
+        at daily cadence from a separate source (Penticton Observatory),
+        not from the OMNI high-res feed. Including it would introduce
+        data leakage risk in the live prediction pipeline.
+        """
+        # IMF clock angle: arctan2(By, Bz) decomposed into sin/cos
+        if "by_gse" in df.columns and "bz_gse" in df.columns:
+            clock_angle = np.arctan2(df["by_gse"], df["bz_gse"])
+            df["clock_angle_sin"] = np.sin(clock_angle)
+            df["clock_angle_cos"] = np.cos(clock_angle)
+
+        # Solar wind dynamic pressure: Pdyn = 0.5 * n * m_p * v^2
+        # In convenient units: Pdyn (nPa) = 1.6726e-6 * n(cm^-3) * v(km/s)^2
+        if "proton_density" in df.columns and "flow_speed" in df.columns:
+            df["dynamic_pressure"] = 1.6726e-6 * df["proton_density"] * df["flow_speed"]**2
 
         return df
 

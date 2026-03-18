@@ -38,6 +38,8 @@ solar_wind:
     - "KP1800"
     - "DST1800"
     - "AE1800"
+    - "AL_INDEX"
+    - "AU_INDEX"
 
 data:
   raw_dir: "data/raw"
