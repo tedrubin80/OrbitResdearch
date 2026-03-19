@@ -7,7 +7,7 @@ Cron:
 import json
 import logging
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import numpy as np
@@ -31,7 +31,7 @@ def fetch_recent_iss(hours=25):
     """Fetch last N hours of ISS positions from NASA SSC API."""
     from src.data.ssc_client import SSCClient
     client = SSCClient()
-    end = datetime.utcnow()
+    end = datetime.now(timezone.utc)
     start = end - timedelta(hours=hours)
     df = client.fetch_positions(
         spacecraft_id="iss",
@@ -98,7 +98,7 @@ def to_lat_lon_alt(pred_norm, training_stats):
         pred_km[:, i] = (pred_norm[:, i] * training_stats["iss"]["std"][col]
                          + training_stats["iss"]["mean"][col])
 
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     times = np.array([np.datetime64(now + timedelta(minutes=t), "ns") for t in range(len(pred_km))])
 
     try:
@@ -173,7 +173,7 @@ def main():
         return 1
 
     output = {
-        "generated_at": datetime.utcnow().isoformat() + "Z",
+        "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "model": "lstm_iss_6h",
         "points": len(path),
         "path": path,
