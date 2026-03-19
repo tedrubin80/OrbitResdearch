@@ -233,18 +233,57 @@ def load_spacecraft_data(spacecraft):
 
 
 def load_solar_wind_data():
-    from huggingface_hub import hf_hub_download
+    """Load solar wind data, preferring local CDAWeb-fetched file (has expanded features).
+
+    Priority:
+    1. Local data/raw/ (may have AL, AU, clock_angle, dynamic_pressure from fresh CDAWeb fetch)
+    2. HF dataset (has original 8 columns only)
+
+    After loading, derives clock_angle_sin/cos and dynamic_pressure if missing.
+    """
     fname = "solar_wind_2023-01-01_2025-12-31.parquet"
+
+    # Try local first (may have expanded features from CDAWeb)
+    local_path = Path(f"data/raw/{fname}")
+    if local_path.exists():
+        log.info(f"  Loading local solar wind: {local_path}")
+        df = pd.read_parquet(local_path)
+        df = _ensure_derived_features(df)
+        log.info(f"  Solar wind columns: {sorted(df.columns.tolist())}")
+        return df
+
+    # Fall back to HF
+    from huggingface_hub import hf_hub_download
     last_err = None
     for prefix in ["", "data/"]:
         try:
             path = hf_hub_download(repo_id=HF_DATASET, filename=f"{prefix}{fname}", repo_type="dataset")
-            return pd.read_parquet(path)
+            df = pd.read_parquet(path)
+            df = _ensure_derived_features(df)
+            log.info(f"  Solar wind columns: {sorted(df.columns.tolist())}")
+            return df
         except Exception as e:
             log.warning(f"  Failed to load {prefix}{fname}: {e}")
             last_err = e
             continue
-    raise FileNotFoundError(f"Could not find {fname} in HF dataset. Last error: {last_err}")
+    raise FileNotFoundError(f"Could not find {fname}. Last error: {last_err}")
+
+
+def _ensure_derived_features(df):
+    """Add derived features if not already present in the DataFrame."""
+    # Clock angle sin/cos (from IMF By, Bz)
+    if "by_gse" in df.columns and "bz_gse" in df.columns:
+        if "clock_angle_sin" not in df.columns:
+            clock_angle = np.arctan2(df["by_gse"], df["bz_gse"])
+            df["clock_angle_sin"] = np.sin(clock_angle)
+            df["clock_angle_cos"] = np.cos(clock_angle)
+
+    # Dynamic pressure (from density, speed)
+    if "proton_density" in df.columns and "flow_speed" in df.columns:
+        if "dynamic_pressure" not in df.columns:
+            df["dynamic_pressure"] = 1.6726e-6 * df["proton_density"] * df["flow_speed"]**2
+
+    return df
 
 
 def preprocess_orbit(df, spacecraft_id):
