@@ -1,10 +1,10 @@
 #!/bin/bash
 set -e
-echo "=== ORBITAL CHAOS — RUNPOD SETUP + EXPANDED FEATURES ==="
+echo "=== ORBITAL CHAOS — RUNPOD EXPANDED FEATURES ==="
 echo "Started: $(date)"
 
 # Install deps
-pip install pyarrow huggingface_hub pyyaml sscws astropy cdasws safetensors -q
+pip install pyarrow huggingface_hub pyyaml sscws astropy safetensors pandas -q
 
 # Setup workspace
 mkdir -p /workspace/OrbitResearch
@@ -14,35 +14,36 @@ cd /workspace/OrbitResearch
 echo ">>> Downloading code from HF..."
 hf download datamatters24/orbital-chaos-predictor --repo-type model --local-dir .
 
-# Download data
+# Download data (includes pre-expanded solar wind with 13 features)
 echo ">>> Downloading data from HF..."
 hf download datamatters24/orbital-chaos-nasa-ssc --repo-type dataset --local-dir data/raw
 mv data/raw/data/*.parquet data/raw/ 2>/dev/null || true
 mkdir -p results checkpoints
 
-# Clear old solar wind cache and re-fetch from CDAWeb with expanded features (AL, AU)
-echo ">>> Clearing cached solar wind..."
-rm -f data/raw/solar_wind_2023-01-01_2025-12-31.parquet
-
-echo ">>> Re-fetching solar wind from CDAWeb with expanded config (AL, AU indices)..."
-pip install cdasws -q 2>/dev/null
-python -c "
-import sys; sys.path.insert(0, '.')
-from src.data.solar_wind import SolarWindClient
-client = SolarWindClient()
-df = client.fetch_solar_wind('2023-01-01', '2025-12-31')
-print(f'Solar wind: {len(df)} rows, columns: {sorted(df.columns.tolist())}')
-"
-
-echo ">>> Verifying expanded features..."
+# Verify solar wind has expanded features
+echo ">>> Verifying solar wind features..."
 python -c "
 import pandas as pd
 df = pd.read_parquet('data/raw/solar_wind_2023-01-01_2025-12-31.parquet')
-expected = ['bx_gse','by_gse','bz_gse','flow_speed','proton_density','kp','dst','ae','al','au','clock_angle_sin','clock_angle_cos','dynamic_pressure']
-found = [c for c in expected if c in df.columns]
-missing = [c for c in expected if c not in df.columns]
-print(f'Found {len(found)}/13 features: {found}')
-if missing: print(f'MISSING: {missing}')
+cols = sorted(df.columns.tolist())
+print(f'Solar wind: {len(df)} rows, {len(cols)} columns: {cols}')
+expected = ['al','au','clock_angle_sin','clock_angle_cos','dynamic_pressure']
+found = [c for c in expected if c in cols]
+missing = [c for c in expected if c not in cols]
+if missing:
+    print(f'MISSING expanded features: {missing}')
+    print('Adding derived features from existing columns...')
+    import numpy as np
+    if 'by_gse' in cols and 'bz_gse' in cols and 'clock_angle_sin' not in cols:
+        ca = np.arctan2(df['by_gse'], df['bz_gse'])
+        df['clock_angle_sin'] = np.sin(ca)
+        df['clock_angle_cos'] = np.cos(ca)
+    if 'proton_density' in cols and 'flow_speed' in cols and 'dynamic_pressure' not in cols:
+        df['dynamic_pressure'] = 1.6726e-6 * df['proton_density'] * df['flow_speed']**2
+    df.to_parquet('data/raw/solar_wind_2023-01-01_2025-12-31.parquet', index=False)
+    print(f'Updated: {len(df)} rows, {len(df.columns)} columns')
+else:
+    print(f'All expanded features present!')
 "
 
 # Run the expanded feature training + ablation

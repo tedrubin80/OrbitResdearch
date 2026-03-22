@@ -76,7 +76,7 @@ class SolarWindClient:
                 # Rename index columns for clarity
                 rename_map = {
                     "KP1800": "kp", "DST1800": "dst", "AE1800": "ae",
-                    "AL_INDEX": "al", "AU_INDEX": "au",
+                    "AL_INDEX1800": "al", "AU_INDEX1800": "au",
                 }
                 indices_df = indices_df.rename(columns={
                     k: v for k, v in rename_map.items() if k in indices_df.columns
