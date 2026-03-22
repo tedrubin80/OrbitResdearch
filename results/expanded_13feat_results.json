@@ -1,0 +1,29 @@
+{
+  "model": "multimodal_iss_6h_13feat",
+  "features": 13,
+  "feature_list": ["ae", "al", "au", "bx_gse", "by_gse", "bz_gse", "clock_angle_cos", "clock_angle_sin", "dst", "dynamic_pressure", "flow_speed", "kp", "proton_density"],
+  "f10_7_excluded": true,
+  "f10_7_reason": "daily cadence only, leakage risk for live pipeline",
+  "baseline_mae": 181.3,
+  "storm_eval": {
+    "multimodal_13feat": {
+      "all": {"n": 507, "mae": 181.3},
+      "quiet": {"n": 389, "mae": 177.4},
+      "kp4": {"n": 63, "mae": 208.1},
+      "kp5": {"n": 23, "mae": 203.1},
+      "kp6": {"n": 6, "mae": 192.7, "underpowered": true}
+    },
+    "lstm": {
+      "all": {"n": 507, "mae": 148.7},
+      "kp5": {"n": 23, "mae": 178.8},
+      "kp6": {"n": 6, "mae": 171.5, "underpowered": true}
+    }
+  },
+  "comparison": {
+    "original_8feat_mae": 163,
+    "expanded_13feat_mae": 181.3,
+    "conclusion": "13-feature model worse than 8-feature. Extra features (AL, AU, clock_angle, dynamic_pressure) add noise rather than signal for ISS orbit prediction."
+  },
+  "runtime_minutes": 16.0,
+  "date": "2026-03-22"
+}
