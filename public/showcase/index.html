@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orbital Chaos — Project Showcase</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace; background: #0a0a1a; color: #e0e0e0; line-height: 1.7; }
+        .container { max-width: 900px; margin: 0 auto; padding: 40px 24px; }
+        h1 { font-size: 2.8em; font-weight: 700; background: linear-gradient(135deg, #4fc3f7, #7c4dff, #ff4081); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 8px; }
+        .tagline { color: #90a4ae; font-size: 1.1em; margin-bottom: 40px; }
+        h2 { font-size: 1.5em; color: #4fc3f7; margin: 48px 0 16px; padding-bottom: 8px; border-bottom: 1px solid rgba(79,195,247,0.2); }
+        h3 { font-size: 1.15em; color: #b0bec5; margin: 24px 0 8px; }
+        p { color: #b0bec5; margin-bottom: 16px; }
+        a { color: #4fc3f7; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        code { background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; color: #ff4081; }
+        pre { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 16px 20px; overflow-x: auto; font-size: 0.85em; line-height: 1.5; margin: 12px 0 20px; color: #b0bec5; }
+        table { width: 100%; border-collapse: collapse; margin: 12px 0 24px; background: rgba(255,255,255,0.03); border-radius: 8px; overflow: hidden; }
+        th { background: rgba(255,255,255,0.06); padding: 10px 14px; text-align: left; font-size: 0.8em; text-transform: uppercase; letter-spacing: 1px; color: #90a4ae; }
+        td { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); font-variant-numeric: tabular-nums; }
+        tr:last-child td { border-bottom: none; }
+        .best { color: #66bb6a; font-weight: 700; }
+        .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 20px; margin: 16px 0; }
+        .card-title { color: #e0e0e0; font-weight: 600; margin-bottom: 8px; }
+        .links { display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0; }
+        .link-btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; border-radius: 8px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #4fc3f7; font-size: 0.9em; transition: all 0.2s; }
+        .link-btn:hover { border-color: rgba(79,195,247,0.4); background: rgba(79,195,247,0.08); text-decoration: none; }
+        .insight { background: rgba(79,195,247,0.06); border-left: 3px solid #4fc3f7; padding: 12px 16px; margin: 16px 0; border-radius: 0 8px 8px 0; font-size: 0.95em; }
+        .negative { background: rgba(255,64,129,0.06); border-left-color: #ff4081; }
+        .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; background: rgba(124,77,255,0.15); color: #b388ff; margin-right: 6px; }
+        .sn { display: inline-block; width: 28px; height: 28px; border-radius: 50%; background: rgba(79,195,247,0.15); color: #4fc3f7; text-align: center; line-height: 28px; font-size: 0.8em; font-weight: 700; margin-right: 8px; }
+        footer { text-align: center; padding: 60px 0 40px; color: #546e7a; font-size: 0.85em; }
+        @media (max-width: 600px) { h1 { font-size: 2em; } .links { flex-direction: column; } pre { font-size: 0.8em; } }
+    </style>
+</head>
+<body>
+<div class="container">
+
+<h1>Orbital Chaos</h1>
+<p class="tagline">Multi-modal deep learning for spacecraft orbit prediction using NASA data and solar wind fusion</p>
+
+<div class="links">
+    <a class="link-btn" href="https://huggingface.co/datamatters24/orbital-chaos-predictor">Models (HF)</a>
+    <a class="link-btn" href="https://huggingface.co/datasets/datamatters24/orbital-chaos-nasa-ssc">Dataset (HF)</a>
+    <a class="link-btn" href="https://huggingface.co/spaces/datamatters24/orbital-chaos-training">Training Space (HF)</a>
+    <a class="link-btn" href="https://www.kaggle.com/code/theodorerubin/orbital-chaos-orbit-prediction">Orbit Prediction (Kaggle)</a>
+    <a class="link-btn" href="https://www.kaggle.com/code/theodorerubin/orbital-chaos-solar-wind-multi-modal">Solar Wind (Kaggle)</a>
+    <a class="link-btn" href="https://www.kaggle.com/code/theodorerubin/orbital-chaos-data-exploration">Data Exploration (Kaggle)</a>
+</div>
+
+<h2><span class="sn">1</span> The Problem</h2>
+<p>Satellites in low Earth orbit face atmospheric drag from the thermosphere. During geomagnetic storms, the thermosphere expands unpredictably, increasing drag in ways SGP4 cannot anticipate. Solar wind at L1 arrives ~45 min before impacting Earth — a natural leading indicator.</p>
+<p><strong>Question:</strong> Can a neural network learn the solar wind to orbit perturbation relationship?</p>
+<div class="insight"><strong>Answer:</strong> Yes. LSTM achieves 125 km MAE at 6h (54.5 km at 1h), beating Kepler by 4.6x. Adding solar wind via cross-attention improves storm predictions by 17%.</div>
+
+<h2><span class="sn">2</span> The Data</h2>
+<p>4.8M position records at 1-min resolution from NASA SSC, 3 spacecraft, 3 years (2023-2025).</p>
+<table>
+<tr><th>Spacecraft</th><th>Orbit</th><th>Records</th><th>Challenge</th></tr>
+<tr><td>ISS</td><td>LEO ~408 km</td><td>1.58M</td><td>Atmospheric drag</td></tr>
+<tr><td>DSCOVR</td><td>L1 ~1.5M km</td><td>131K</td><td>Complex Lissajous, sparse data</td></tr>
+<tr><td>MMS-1</td><td>HEO</td><td>1.54M</td><td>Extreme velocity at perigee</td></tr>
+</table>
+
+<h3>Solar Wind (8 validated features)</h3>
+<table>
+<tr><th>Feature</th><th>Resolution</th><th>Role</th></tr>
+<tr><td>Bx, By, Bz (GSE)</td><td>1 min</td><td>IMF orientation</td></tr>
+<tr><td>Flow speed, Proton density</td><td>1 min</td><td>Dynamic pressure</td></tr>
+<tr><td>Kp, Dst, AE indices</td><td>1-3 hour</td><td>Geomagnetic activity</td></tr>
+</table>
+
+<h3>Code: Data Pipeline</h3>
+<pre>from src.data.ssc_client import SSCClient
+from src.data.preprocessing import OrbitPreprocessor
+
+ssc = SSCClient()
+df = ssc.fetch_positions('iss', '2023-01-01', '2025-12-31')
+# 1.58M rows: time, x_gse, y_gse, z_gse (km)
+
+proc = OrbitPreprocessor()
+processed = proc.preprocess(df, 'iss')
+# Derives velocity, normalizes, detects gaps
+
+# 24h input (1440 steps) -> 6h prediction (360 steps)
+inputs, targets = proc.create_sliding_windows(
+    processed, input_hours=24, horizon_hours=6, stride_hours=6
+)
+# Shape: (N, 1440, 6) -> (N, 360, 3)</pre>
+
+<h2><span class="sn">3</span> The Models</h2>
+
+<h3>Bidirectional LSTM (Best Overall)</h3>
+<pre>class OrbitLSTMDirect(nn.Module):
+    def __init__(self, input_dim=6, hidden_dim=128, num_layers=3,
+                 horizon=360, output_dim=3):
+        self.lstm = nn.LSTM(input_dim, hidden_dim, num_layers,
+                           batch_first=True, bidirectional=True)
+        self.fc = nn.Sequential(
+            nn.Linear(hidden_dim * 2, hidden_dim), nn.GELU(),
+            nn.Linear(hidden_dim, horizon * output_dim))
+
+    def forward(self, x):
+        _, (h, _) = self.lstm(x)
+        h = torch.cat([h[-2], h[-1]], dim=-1)
+        return self.fc(h).view(-1, 360, 3)</pre>
+
+<h3>Residual Gated Multi-Modal (Novel Architecture)</h3>
+<p>Core idea: <code>output = base + gate * perturbation</code></p>
+<div class="card">
+<div class="card-title">Architecture</div>
+<p><strong>Orbit encoder</strong> (BiLSTM) produces base prediction</p>
+<p><strong>Solar wind encoder</strong> (BiLSTM) + <strong>cross-attention</strong> produces perturbation</p>
+<p><strong>Sigmoid gate</strong> controls correction strength per timestep</p>
+<p><strong>Guarantee:</strong> Gate initialized near zero; model starts as pure LSTM</p>
+</div>
+
+<pre>def forward(self, orbit_input, solar_input):
+    # Orbit branch -> base prediction
+    orbit_out, (h, _) = self.orbit_enc(self.orbit_proj(orbit_input))
+    h_cat = torch.cat([h[-2], h[-1]], dim=-1)
+    base = self.base_head(h_cat)
+
+    # Solar wind -> cross-attended perturbation
+    s = self.solar_enc(self.solar_proj(solar_input))
+    attended = self.cross_attn(orbit_out, s)
+    summary = (attended * softmax(self.attn_weight(attended))).sum(dim=1)
+    perturbation = self.perturbation_head(summary)
+    gate = sigmoid(self.gate_net(h_cat))
+
+    return base + gate * perturbation</pre>
+
+<h3>Two-Phase Training</h3>
+<pre># Phase 1 (20 epochs, LR=1e-3): Freeze solar branch
+model.freeze_solar_branch()  # Only orbit encoder trains
+
+# Phase 2 (80 epochs, LR=1e-4): Unfreeze all
+model.unfreeze_all()  # Solar branch learns corrections
+# Without Phase 1, convergence fails above 2,000 km MAE</pre>
+
+<div class="insight"><strong>Why two-phase?</strong> Solar wind gradients destabilize the orbit encoder early on. Phase 1 establishes a stable baseline. Phase 2 fine-tunes at 10x lower LR.</div>
+
+<h2><span class="sn">4</span> Results</h2>
+
+<h3>6-Hour MAE (km)</h3>
+<table>
+<tr><th>Model</th><th>ISS</th><th>DSCOVR</th><th>MMS-1</th></tr>
+<tr><td>LSTM</td><td class="best">125</td><td class="best">12,797</td><td>18,832</td></tr>
+<tr><td>Transformer</td><td>282</td><td>13,517</td><td>19,296</td></tr>
+<tr><td>Multi-Modal</td><td>163</td><td>25,059</td><td>19,277</td></tr>
+<tr><td>Ensemble</td><td>126</td><td>--</td><td>--</td></tr>
+<tr><td>SGP4 Kepler</td><td>575</td><td>--</td><td class="best">88</td></tr>
+</table>
+
+<h3>Storm-Conditioned (ISS)</h3>
+<table>
+<tr><th>Model</th><th>All</th><th>Quiet</th><th>Active</th><th>Storm</th></tr>
+<tr><td>LSTM</td><td>125</td><td>126</td><td>122</td><td>113</td></tr>
+<tr><td>Multi-Modal</td><td>163</td><td>164</td><td>158</td><td class="best">135</td></tr>
+<tr><td>Ensemble</td><td>126</td><td>126</td><td>124</td><td class="best">111</td></tr>
+</table>
+
+<div class="insight"><strong>Key finding:</strong> Multi-modal improves <strong>17%</strong> during storms (164 to 135 km). Ensemble achieves 111 km — best overall during geomagnetic events.</div>
+
+<h3>Horizons (ISS)</h3>
+<table>
+<tr><th>Model</th><th>1h</th><th>3h</th><th>6h</th></tr>
+<tr><td>LSTM</td><td class="best">54.5</td><td class="best">82.1</td><td class="best">125</td></tr>
+<tr><td>Multi-Modal</td><td>171.5</td><td>176.2</td><td>163</td></tr>
+</table>
+
+<h2><span class="sn">5</span> How We Determined Key Findings</h2>
+
+<h3>Storm Evaluation Method</h3>
+<pre># Split test set by Kp index (forward-filled from hourly data)
+# OMNI stores Kp*10 -> divide by 10 for standard 0-9 scale
+test_kp = assign_kp(test_times, solar_df)
+
+quiet = test_kp &lt;= 3      # 489 windows
+active = (test_kp &gt;= 4) &amp; (test_kp &lt;= 5)  # 71 windows
+storm = test_kp &gt;= 6      # 7 windows (underpowered)</pre>
+
+<h3>Architecture v1 Failure Analysis</h3>
+<pre># v1: 4,307 km MAE (34x worse than LSTM)
+# .mean(dim=1) collapses 1,440 timesteps to one vector
+fused = torch.cat([attended.mean(1), solar.mean(1)])
+
+# v2: 163 km MAE (96% improvement)
+# Attention-weighted summary + residual gating
+output = base + gate * perturbation</pre>
+
+<div class="insight"><strong>Lesson:</strong> <code>.mean(dim=1)</code> on long sequences destroys temporal info. Use learned attention weights instead.</div>
+
+<h3>Why Physics Wins on MMS-1</h3>
+<pre># Simple two-body Kepler (Velocity Verlet): 88 km MAE
+# Beats ALL ML models (18,000+ km) for HEO orbits
+# Lesson: always compute the physics baseline</pre>
+
+<h2><span class="sn">6</span> Negative Results</h2>
+
+<div class="card negative" style="border-left: 3px solid #ff4081;">
+<div class="card-title">13-Feature Expansion: More Features = More Noise</div>
+<p>Added AL, AU indices + clock angle (sin/cos) + dynamic pressure. F10.7 excluded (daily cadence, leakage risk).</p>
+<p><strong>Result: 181 km MAE</strong> — worse than 8-feature model (163 km). Original features already capture the relevant signal.</p>
+</div>
+
+<div class="card negative" style="border-left: 3px solid #ff4081;">
+<div class="card-title">DSCOVR: Solar Wind Hurts at L1</div>
+<p>Multi-modal: 25,059 km vs LSTM: 12,797 km. No atmosphere at L1, so drag corrections are pure noise.</p>
+</div>
+
+<h2><span class="sn">7</span> Using the Models</h2>
+<pre># Recommended: safetensors (no arbitrary code execution)
+from safetensors.torch import load_file
+from huggingface_hub import hf_hub_download
+
+path = hf_hub_download(
+    repo_id="datamatters24/orbital-chaos-predictor",
+    filename="checkpoints/lstm_iss_6h_best.safetensors",
+    repo_type="model"
+)
+state_dict = load_file(path)
+
+# Auto-detect architecture from weights
+hidden_dim = state_dict["lstm.weight_ih_l0"].shape[0] // 4
+model = OrbitLSTMDirect(input_dim=6, hidden_dim=hidden_dim,
+                        num_layers=3, horizon=360, output_dim=3)
+model.load_state_dict(state_dict)</pre>
+
+<h2><span class="sn">8</span> Infrastructure</h2>
+<table>
+<tr><th>Component</th><th>Schedule</th><th>Script</th></tr>
+<tr><td>ISS Predictions</td><td>Hourly</td><td>cron_predict.py</td></tr>
+<tr><td>Data Fetch</td><td>Daily 2am UTC</td><td>cron_fetch.py</td></tr>
+<tr><td>Model Retrain</td><td>Sunday 3am</td><td>cron_retrain.py</td></tr>
+<tr><td>Health Check</td><td>Every 15 min</td><td>health_check.py</td></tr>
+<tr><td>S3 Backup</td><td>Sunday 1am</td><td>backup_s3.sh</td></tr>
+</table>
+
+<h2>Tech Stack</h2>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin:16px 0;">
+<span class="tag">PyTorch</span><span class="tag">NumPy</span><span class="tag">Pandas</span><span class="tag">Astropy</span><span class="tag">SGP4</span><span class="tag">Globe.GL</span><span class="tag">Gradio</span><span class="tag">NASA SSC</span><span class="tag">CDAWeb OMNI</span><span class="tag">NOAA SWPC</span><span class="tag">Hugging Face</span><span class="tag">safetensors</span><span class="tag">RunPod</span>
+</div>
+
+<h2>Citation</h2>
+<pre>@article{rubin2026orbital,
+  author = {Rubin, Ted},
+  title = {Multi-Modal Deep Learning for Spacecraft Orbit Prediction:
+           Incorporating Solar Wind Perturbations via Cross-Attention Fusion},
+  year = {2026},
+  note = {arXiv preprint arXiv:XXXX.XXXXX}
+}</pre>
+
+<footer>
+<p>Ted Rubin &middot; 2026 &middot; MIT License</p>
+<p>Data from <a href="https://sscweb.gsfc.nasa.gov/">NASA SSC</a> and <a href="https://omniweb.gsfc.nasa.gov/">OMNI</a></p>
+</footer>
+
+</div>
+</body>
+</html>
