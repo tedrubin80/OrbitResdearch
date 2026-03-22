@@ -92,6 +92,10 @@ fused = torch.cat([attended.mean(dim=1), solar.mean(dim=1)], dim=-1)
 
 Collapsing 1,440 timesteps of cross-attended features into a single vector threw away everything the attention mechanism learned. Combined with no residual connection, the model had to re-learn basic orbit prediction from scratch through this bottleneck. The v2 residual gated design fixed both issues and brought the MAE from 4,307 km down to 163 km — a **96% improvement**.
 
+## More Features Isn't Always Better
+
+We also tested an expanded 13-feature solar wind input — adding AL/AU auroral indices, IMF clock angle, and dynamic pressure to the original 8 features. The result? **181 km MAE** — worse than the 8-feature model (163 km). The original feature set already captures the relevant signal. More data doesn't help if it's noise.
+
 ## Prediction at Every Horizon
 
 | Model | 1 hour | 3 hours | 6 hours |

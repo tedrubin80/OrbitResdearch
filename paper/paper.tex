@@ -636,6 +636,19 @@ of the cross-attended features increased ISS MAE from 175~km to
 $\sim$600~km, confirming that temporal structure in the attended
 features is important.
 
+\textbf{Expanded feature set does not improve performance.}
+We tested an expanded 13-feature solar wind input adding AL and AU
+auroral indices, IMF clock angle (sin/cos decomposition of
+$\arctan(B_y, B_z)$), and solar wind dynamic pressure
+($\frac{1}{2} n m_p v^2$) to the original 8 features. F10.7 solar
+flux was excluded due to daily-only cadence creating data leakage
+risk. The 13-feature model achieved 181~km MAE---worse than the
+8-feature model (163~km). This indicates the original feature set
+(IMF components, flow speed, density, Kp, Dst, AE) already captures
+the relevant solar wind signal for LEO drag prediction. Additional
+geomagnetic indices and derived quantities add noise rather than
+information beyond what the model extracts from raw measurements.
+
 % ============================================================
 \section{Discussion}
 \label{sec:discussion}
