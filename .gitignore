@@ -31,3 +31,9 @@ logs/
 # OS
 .DS_Store
 Thumbs.db
+
+# Firebase
+firebase-debug.log
+
+# Superpowers brainstorm
+.superpowers/
